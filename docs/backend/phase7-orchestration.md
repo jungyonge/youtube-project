@@ -46,8 +46,15 @@ def resume_pipeline(job_id: str, from_step: str) -> AsyncResult:
 
 비동기/동기 분리:
 - 네트워크 I/O (AI API, S3): async 가능 task
+  (openai, google-genai SDK 자체가 sync이므로 그대로 사용 가능)
+  (async SDK 사용 시 asgiref.sync.async_to_sync 래퍼 필수)
 - 렌더/FFmpeg/MoviePy: sync worker task (CPU 바운드)
-  → task_routes로 sync_worker 큐에 라우팅
+  → task_routes로 render 큐에 라우팅
+
+⚠️ DB 접근 규칙:
+- **모든 Celery task에서 반드시 sync_session.py의 SyncSession 사용**
+- 절대로 Celery task 안에서 AsyncSession을 import하지 말 것
+- Event Loop 충돌/Deadlock 발생 원인
 
 Cost Guardrail 통합:
 - 각 AI API 호출 후 cost_tracker.record_cost()
@@ -63,7 +70,7 @@ Cost Guardrail 통합:
 """
 Celery 앱 설정.
 
-설정:
+기본 설정:
 - broker: Redis (settings.REDIS_URL)
 - result_backend: Redis
 - task_serializer: json
@@ -71,12 +78,35 @@ Celery 앱 설정.
 - accept_content: ["json"]
 - task_track_started: True
 - task_acks_late: True (장애 복구)
-- worker_prefetch_multiplier: 1
 
-Task 라우팅:
-- 기본 큐: "default" (API 계층 task)
-- sync_worker 큐: "sync" (FFmpeg, MoviePy)
-  → assemble_task는 sync 큐로 라우팅
+⚠️ 필수 설정 (치명적 중복 렌더링 방지):
+
+# 브로커 타임아웃
+# 15분 영상 렌더링에 10~20분 소요.
+# 기본 visibility_timeout(1시간)이 지나면 Redis가
+# "워커가 죽었다"고 판단하여 다른 워커에 작업을 재할당한다.
+# → 동일 영상을 2번 렌더링 = 비용/자원 2배 폭발
+# 따라서 넉넉하게 4시간(14400초)으로 설정.
+broker_transport_options = {
+    'visibility_timeout': 14400,  # 4시간
+}
+
+# 큐 라우팅
+task_routes = {
+    'app.pipeline.steps.step5_assemble.*': {'queue': 'render'},
+    # 나머지는 default 큐 자동
+}
+
+# 렌더 큐 prefetch 제한 (한 번에 1개만 가져옴)
+worker_prefetch_multiplier = 1  # render worker용
+
+# Task 결과 만료 (24시간)
+result_expires = 86400
+
+# 직렬화
+task_serializer = 'json'
+result_serializer = 'json'
+accept_content = ['json']
 
 Task autodiscover:
 - app.pipeline.steps 패키지의 모든 task 자동 발견
@@ -119,6 +149,17 @@ Celery Beat 주기적 작업.
 GET /api/v1/videos/{job_id}/stream
 
 Auth: Bearer JWT (해당 job의 소유자만 구독 가능)
+
+SSE 토큰 처리 (중요):
+  EventSource API는 커스텀 헤더를 지원하지 않으므로,
+  SSE 엔드포인트는 쿼리 파라미터로도 JWT를 받을 수 있어야 한다.
+
+  GET /api/v1/videos/{job_id}/stream?token={jwt}
+
+  stream.py에서:
+  1. Authorization 헤더에서 토큰 추출 시도
+  2. 없으면 query parameter 'token'에서 추출
+  3. 둘 다 없으면 401 반환
 
 구현: Redis Pub/Sub → sse-starlette EventSourceResponse
 

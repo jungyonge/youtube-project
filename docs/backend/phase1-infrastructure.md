@@ -6,6 +6,18 @@
 
 ---
 
+## 저장소 삼분할 원칙
+
+```
+Redis    = 휘발성 (큐, 캐시, pub/sub, 실시간 상태)
+Postgres = 진실의 원천 (유저, Job, Step, 비용, 에러 로그, 소스 메타)
+MinIO/S3 = 산출물 저장 (이미지, 오디오, 영상, 대본 JSON)
+```
+파일 경로 대신 **object key + presigned URL**로 산출물을 관리한다.
+로컬 파일시스템은 **개발 환경 전용**으로만 허용한다.
+
+---
+
 ## 구현 항목
 
 ### 1. 디렉토리 구조 생성
@@ -39,7 +51,8 @@ ai-video-pipeline/
 │   │       └── __init__.py
 │   ├── db/
 │   │   ├── __init__.py
-│   │   ├── session.py
+│   │   ├── session.py            # async SQLAlchemy session (API용)
+│   │   ├── sync_session.py       # sync SQLAlchemy session (Celery Worker용)
 │   │   ├── models/
 │   │   │   ├── __init__.py
 │   │   │   ├── user.py
@@ -49,7 +62,10 @@ ai-video-pipeline/
 │   │   │   ├── asset.py
 │   │   │   └── cost_log.py
 │   │   └── repositories/
-│   │       └── __init__.py
+│   │       ├── __init__.py
+│   │       ├── job_repo.py
+│   │       ├── user_repo.py
+│   │       └── asset_repo.py
 │   ├── storage/
 │   │   ├── __init__.py
 │   │   └── object_store.py
@@ -84,6 +100,7 @@ sse-starlette>=2.0.0
 # Database
 sqlalchemy[asyncio]>=2.0.25
 asyncpg>=0.29.0
+psycopg2-binary>=2.9.9    # Celery Worker용 동기 DB 드라이버
 alembic>=1.13.0
 
 # Redis / Queue
@@ -153,7 +170,8 @@ class Settings(BaseSettings):
     OPENAI_IMAGE_SIZE: str = "1792x1024"
 
     # Database
-    DATABASE_URL: str
+    DATABASE_URL: str              # postgresql+asyncpg://... (API용)
+    SYNC_DATABASE_URL: str         # postgresql+psycopg2://... (Celery Worker용)
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -194,15 +212,26 @@ class Settings(BaseSettings):
 
 **파일**: `docker-compose.yml`
 
-6개 서비스:
-| 서비스 | 이미지 | 포트 | 리소스 |
-|--------|--------|------|--------|
-| postgres | postgres:16-alpine | 5432 | - |
-| redis | redis:7-alpine | 6379 | - |
-| minio | minio/minio | 9000, 9001 | - |
-| api | Dockerfile.api | 8000 | CPU 1.0, Mem 512M |
-| worker | Dockerfile.worker | - | CPU 4.0, Mem 8G |
-| beat | Dockerfile.worker | - | CPU 0.5, Mem 256M |
+**7개 서비스** (렌더 워커 분리):
+| 서비스 | 이미지 | 포트 | 리소스 | 역할 |
+|--------|--------|------|--------|------|
+| postgres | postgres:16-alpine | 5432 | - | DB |
+| redis | redis:7-alpine | 6379 | - | 큐/캐시/PubSub |
+| minio | minio/minio | 9000, 9001 | - | Object Storage |
+| api | Dockerfile.api | 8000 | CPU 1.0, Mem 512M | FastAPI 서버 |
+| worker-default | Dockerfile.worker | - | CPU 2.0, Mem 2G | 경량 task (추출, AI API, 텍스트) |
+| worker-render | Dockerfile.worker | - | CPU 4.0, Mem 8G | Step 5 영상 조립 전용 |
+| beat | Dockerfile.worker | - | CPU 0.5, Mem 256M | 주기 작업 스케줄러 |
+
+```
+worker-default: celery worker --queues=default --concurrency=4
+worker-render:  celery worker --queues=render  --concurrency=1
+```
+
+**워커 큐 분리 이유:**
+MoviePy/FFmpeg 렌더링은 메모리를 극도로 많이 사용한다.
+concurrency=2인 워커에서 영상 2개를 동시에 렌더링하면 OOM으로 컨테이너가 뻗는다.
+따라서 렌더 전용 큐를 **concurrency=1**로 분리하여 한 번에 한 영상만 렌더링하도록 강제한다.
 
 - MinIO 초기 버킷: `video-pipeline-assets`, `video-pipeline-outputs`
 - 볼륨: `postgres_data`, `minio_data`
@@ -337,6 +366,7 @@ class Asset(Base):
     mime_type: Mapped[str | None]
     duration_sec: Mapped[float | None]
     is_fallback: Mapped[bool]
+    is_deleted: Mapped[bool]           # default=False, S3에서 삭제된 중간 산출물
     created_at: Mapped[datetime]
 ```
 
@@ -394,11 +424,60 @@ class ObjectStore:
     async def list_objects(bucket, prefix) → list[str]
 ```
 
-### 11. DB 세션 관리
+### 11. DB 세션 관리 (async/sync 분리 — 치명적 호환성 문제 방지)
 
-**파일**: `app/db/session.py`
-- async SQLAlchemy engine + sessionmaker
-- `get_db()` dependency (FastAPI)
+```python
+"""
+FastAPI(API 계층)와 Celery(Worker 계층)는 DB 접근 방식이 달라야 한다.
+
+문제:
+  Celery는 태생적으로 동기(Synchronous) 워커다.
+  Celery Task 안에서 비동기 SQLAlchemy 세션(asyncpg)을 호출하면
+  Event Loop 충돌이 발생하거나 Deadlock에 빠진다.
+
+해결: 세션을 두 벌 준비한다.
+"""
+```
+
+**파일**: `app/db/session.py` (API 계층 전용 - async)
+- AsyncSession + asyncpg 드라이버
+- FastAPI의 `Depends()`로 주입
+- `DATABASE_URL = "postgresql+asyncpg://..."`
+
+```python
+# session.py
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+
+engine = create_async_engine(settings.DATABASE_URL)
+AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession)
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        yield session
+```
+
+**파일**: `app/db/sync_session.py` (Celery Worker 전용 - sync)
+- Session + psycopg2 드라이버
+- Celery task 함수 내부에서 직접 사용
+- `SYNC_DATABASE_URL = "postgresql+psycopg2://..."`
+
+```python
+# sync_session.py
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+
+sync_engine = create_engine(settings.SYNC_DATABASE_URL)
+SyncSessionLocal = sessionmaker(sync_engine)
+
+def get_sync_db() -> Generator[Session, None, None]:
+    with SyncSessionLocal() as session:
+        yield session
+```
+
+**절대 규칙:**
+- API 라우트 → `session.py`의 AsyncSession만 사용
+- Celery task → `sync_session.py`의 SyncSession만 사용
+- **절대로 Celery task 안에서 AsyncSession을 import하지 말 것**
 
 ---
 

@@ -14,7 +14,7 @@ from sqlalchemy import select
 from app.config import settings
 from app.db.models.source import Source
 from app.db.models.video_job import VideoJob
-from app.db.session import async_session_factory
+from app.db.sync_session import SyncSessionLocal
 from app.pipeline.models.evidence import EvidencePack, RankedEvidence, SourceChunk
 from app.pipeline.step_utils import begin_step, check_cancelled, complete_step, fail_step
 from app.storage.object_store import object_store
@@ -23,6 +23,20 @@ from app.workers.celery_app import celery_app
 TOP_N_CHUNKS = 30
 CHUNK_SIZE_MIN = 300
 CHUNK_SIZE_MAX = 500
+
+
+def _run_async(coro):
+    """Run an async coroutine from sync Celery task context."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
 
 
 def _chunk_text(text: str, source_id: str) -> list[SourceChunk]:
@@ -47,7 +61,6 @@ def _chunk_text(text: str, source_id: str) -> list[SourceChunk]:
             buffer = ""
 
         if len(para) > CHUNK_SIZE_MAX:
-            # 긴 문단은 문장 단위로 분리
             sentences = re.split(r"(?<=[.!?。\n])\s+", para)
             temp = ""
             for sent in sentences:
@@ -114,7 +127,7 @@ def _compute_relevance_scores(chunks: list[SourceChunk], topic: str) -> list[flo
 def _compute_recency_score(published_at: datetime | None) -> float:
     """최신성 점수 (exp decay, 반감기 7일)."""
     if not published_at:
-        return 0.5  # 날짜 불명이면 중간값
+        return 0.5
 
     now = datetime.now(timezone.utc)
     if published_at.tzinfo is None:
@@ -127,31 +140,52 @@ def _compute_recency_score(published_at: datetime | None) -> float:
     return math.exp(-0.693 * age_days / half_life)
 
 
+def _extract_key_claims(topic: str, chunks: list[RankedEvidence]) -> list[str]:
+    """Gemini Flash로 핵심 주장 추출. 실패 시 상위 청크 첫 문장으로 대체."""
+    try:
+        from app.services.gemini_client import GeminiClient
+        client = GeminiClient()
+
+        combined_text = "\n\n".join(c.chunk.text[:300] for c in chunks[:10])
+        prompt = (
+            f"주제: {topic}\n\n"
+            f"아래 자료에서 핵심 주장 5~10개를 한 줄씩 추출하세요. "
+            f"번호를 붙이지 말고, 한 줄에 하나씩만 작성하세요.\n\n"
+            f"{combined_text}"
+        )
+        response = _run_async(client.generate(prompt, temperature=0.3))
+        claims = [line.strip() for line in response.text.strip().split("\n") if line.strip()]
+        if claims:
+            return claims[:10]
+    except Exception as e:
+        logger.warning("Gemini key claims extraction failed (using fallback): {}", e)
+
+    # Fallback: 상위 청크 첫 문장
+    claims = []
+    for c in chunks[:8]:
+        first_sentence = re.split(r"[.!?。]", c.chunk.text)[0].strip()
+        if first_sentence and len(first_sentence) > 10:
+            claims.append(first_sentence)
+    return claims
+
+
 @celery_app.task(name="pipeline.evidence_pack", bind=True, max_retries=0)
 def evidence_pack_task(self, job_id: str) -> str:
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return loop.run_until_complete(_build_evidence_pack(job_id))
-
-
-async def _build_evidence_pack(job_id: str) -> str:
     step_name = "evidence_pack"
-    step_id = await begin_step(job_id, step_name)
+    step_id = begin_step(job_id, step_name)
 
     try:
-        if await check_cancelled(job_id):
+        if check_cancelled(job_id):
             raise RuntimeError("Job cancelled")
 
-        # Job + Sources 로드
-        async with async_session_factory() as db:
-            job_result = await db.execute(
+        # Job + Sources 로드 (sync DB)
+        with SyncSessionLocal() as db:
+            job_result = db.execute(
                 select(VideoJob).where(VideoJob.id == uuid.UUID(job_id))
             )
             job = job_result.scalar_one()
 
-            src_result = await db.execute(
+            src_result = db.execute(
                 select(Source).where(
                     Source.job_id == uuid.UUID(job_id),
                     Source.content_snapshot_key.isnot(None),
@@ -167,9 +201,9 @@ async def _build_evidence_pack(job_id: str) -> str:
         source_meta: dict[str, dict] = {}
 
         for source in dedup_sources:
-            snapshot_bytes = await object_store.download(
+            snapshot_bytes = _run_async(object_store.download(
                 settings.S3_ASSETS_BUCKET, source.content_snapshot_key  # type: ignore[arg-type]
-            )
+            ))
             snapshot = json.loads(snapshot_bytes.decode("utf-8"))
             text = snapshot.get("text_content", "")
 
@@ -196,7 +230,6 @@ async def _build_evidence_pack(job_id: str) -> str:
         # 2. 랭킹
         relevance_scores = _compute_relevance_scores(all_chunks, topic)
 
-        # source별 recency / reliability 매핑
         source_recency: dict[str, float] = {}
         source_reliability: dict[str, float] = {}
         for source in dedup_sources:
@@ -223,8 +256,8 @@ async def _build_evidence_pack(job_id: str) -> str:
         ranked.sort(key=lambda r: r.composite_score, reverse=True)
         top_chunks = ranked[:TOP_N_CHUNKS]
 
-        # 4. 핵심 주장 요약 (Gemini가 없으면 상위 청크에서 추출)
-        key_claims = await _extract_key_claims(topic, top_chunks)
+        # 4. 핵심 주장 요약
+        key_claims = _extract_key_claims(topic, top_chunks)
 
         # EvidencePack 생성
         evidence_pack = EvidencePack(
@@ -238,14 +271,14 @@ async def _build_evidence_pack(job_id: str) -> str:
 
         # S3 저장
         pack_key = f"{job_id}/evidence_pack.json"
-        await object_store.upload(
+        _run_async(object_store.upload(
             settings.S3_ASSETS_BUCKET,
             pack_key,
             evidence_pack.model_dump_json(indent=2).encode("utf-8"),
             content_type="application/json",
-        )
+        ))
 
-        await complete_step(
+        complete_step(
             step_id, job_id, step_name,
             progress_percent=20,
             artifact_keys=[pack_key],
@@ -262,34 +295,5 @@ async def _build_evidence_pack(job_id: str) -> str:
         return job_id
 
     except Exception as e:
-        await fail_step(step_id, job_id, step_name, e)
+        fail_step(step_id, job_id, step_name, e)
         raise
-
-
-async def _extract_key_claims(topic: str, chunks: list[RankedEvidence]) -> list[str]:
-    """Gemini Flash로 핵심 주장 추출. 실패 시 상위 청크 첫 문장으로 대체."""
-    try:
-        from app.services.gemini_client import GeminiClient
-        client = GeminiClient()
-
-        combined_text = "\n\n".join(c.chunk.text[:300] for c in chunks[:10])
-        prompt = (
-            f"주제: {topic}\n\n"
-            f"아래 자료에서 핵심 주장 5~10개를 한 줄씩 추출하세요. "
-            f"번호를 붙이지 말고, 한 줄에 하나씩만 작성하세요.\n\n"
-            f"{combined_text}"
-        )
-        response = await client.generate(prompt, temperature=0.3)
-        claims = [line.strip() for line in response.text.strip().split("\n") if line.strip()]
-        if claims:
-            return claims[:10]
-    except Exception as e:
-        logger.warning("Gemini key claims extraction failed (using fallback): {}", e)
-
-    # Fallback: 상위 청크 첫 문장
-    claims = []
-    for c in chunks[:8]:
-        first_sentence = re.split(r"[.!?。]", c.chunk.text)[0].strip()
-        if first_sentence and len(first_sentence) > 10:
-            claims.append(first_sentence)
-    return claims

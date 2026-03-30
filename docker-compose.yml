@@ -65,6 +65,7 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:password@postgres:5432/video_pipeline
+      SYNC_DATABASE_URL: postgresql+psycopg2://postgres:password@postgres:5432/video_pipeline
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT_URL: http://minio:9000
     depends_on:
@@ -80,15 +81,41 @@ services:
           cpus: "1.0"
           memory: 512M
 
-  worker:
+  worker-default:
     build:
       context: .
       dockerfile: Dockerfile.worker
-    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2
+    command: celery -A app.workers.celery_app worker --queues=default --loglevel=info --concurrency=4
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:password@postgres:5432/video_pipeline
+      SYNC_DATABASE_URL: postgresql+psycopg2://postgres:password@postgres:5432/video_pipeline
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: http://minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  worker-render:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    command: celery -A app.workers.celery_app worker --queues=render --loglevel=info --concurrency=1
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:password@postgres:5432/video_pipeline
+      SYNC_DATABASE_URL: postgresql+psycopg2://postgres:password@postgres:5432/video_pipeline
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT_URL: http://minio:9000
     depends_on:
@@ -113,6 +140,7 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:password@postgres:5432/video_pipeline
+      SYNC_DATABASE_URL: postgresql+psycopg2://postgres:password@postgres:5432/video_pipeline
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT_URL: http://minio:9000
     depends_on:

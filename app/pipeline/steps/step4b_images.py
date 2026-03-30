@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import io
 import json
+import threading
 import uuid
 
 from loguru import logger
@@ -11,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from app.config import settings
 from app.db.models.asset import Asset
-from app.db.session import async_session_factory
+from app.db.sync_session import SyncSessionLocal
 from app.pipeline.models.script import FullScript, SceneAssetPlan
 from app.pipeline.step_utils import begin_step, check_cancelled, complete_step, fail_step
 from app.services.cost_tracker import cost_tracker
@@ -20,6 +21,19 @@ from app.storage.object_store import object_store
 from app.workers.celery_app import celery_app
 
 TARGET_SIZE = (1920, 1080)
+
+
+def _run_async(coro):
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
 
 
 def _get_font(size: int = 40) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -182,14 +196,14 @@ def _create_split_screen(data: dict | None) -> bytes:
     return buf.getvalue()
 
 
-async def _generate_asset_image(
+def _generate_asset_image(
     plan: SceneAssetPlan,
     scene_id: int,
     keywords: list[str],
     narration: str,
     openai_client: OpenAIClient,
     job_id: str,
-    semaphore: asyncio.Semaphore,
+    semaphore: threading.Semaphore,
 ) -> tuple[bytes, float, bool]:
     """에셋 타입별 이미지 생성. 반환: (image_bytes, cost, is_fallback)."""
 
@@ -198,8 +212,8 @@ async def _generate_asset_image(
             if not plan.generation_prompt:
                 return _create_text_overlay(keywords, narration[:40]), 0.0, True
             try:
-                async with semaphore:
-                    img_bytes, cost = await openai_client.generate_image(plan.generation_prompt)
+                with semaphore:
+                    img_bytes, cost = _run_async(openai_client.generate_image(plan.generation_prompt))
                 # 리사이즈
                 img = Image.open(io.BytesIO(img_bytes))
                 img = _resize_to_target(img)
@@ -232,37 +246,29 @@ async def _generate_asset_image(
 
 @celery_app.task(name="pipeline.images", bind=True, max_retries=0)
 def images_task(self, job_id: str) -> str:
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return loop.run_until_complete(_images(job_id))
-
-
-async def _images(job_id: str) -> str:
     step_name = "images"
-    step_id = await begin_step(job_id, step_name)
+    step_id = begin_step(job_id, step_name)
 
     try:
-        if await check_cancelled(job_id):
+        if check_cancelled(job_id):
             raise RuntimeError("Job cancelled")
 
         # FullScript 로드
         script_key = f"{job_id}/script.json"
-        script_bytes = await object_store.download(settings.S3_ASSETS_BUCKET, script_key)
+        script_bytes = _run_async(object_store.download(settings.S3_ASSETS_BUCKET, script_key))
         script = FullScript.model_validate(json.loads(script_bytes.decode("utf-8")))
 
         openai_client = OpenAIClient()
-        semaphore = asyncio.Semaphore(settings.MAX_CONCURRENT_IMAGE_REQUESTS)
+        semaphore = threading.Semaphore(settings.MAX_CONCURRENT_IMAGE_REQUESTS)
         artifact_keys: list[str] = []
         total_cost = 0.0
 
         for scene in script.scenes:
-            if await check_cancelled(job_id):
+            if check_cancelled(job_id):
                 raise RuntimeError("Job cancelled")
 
             # 예산 체크 → degradation
-            budget = await cost_tracker.check_budget(job_id)
+            budget = _run_async(cost_tracker.check_budget(job_id))
 
             plan = scene.asset_plan[0] if scene.asset_plan else SceneAssetPlan(asset_type="text_overlay")
 
@@ -272,7 +278,7 @@ async def _images(job_id: str) -> str:
                     logger.info("Degrading scene {} image to text_overlay (budget {:.0f}%)", scene.scene_id, budget.percent_used)
                     plan = SceneAssetPlan(asset_type="text_overlay")
 
-            img_bytes, cost, is_fallback = await _generate_asset_image(
+            img_bytes, cost, is_fallback = _generate_asset_image(
                 plan=plan,
                 scene_id=scene.scene_id,
                 keywords=scene.keywords,
@@ -284,13 +290,13 @@ async def _images(job_id: str) -> str:
 
             # S3 업로드
             img_key = f"{job_id}/images/scene_{scene.scene_id}.png"
-            await object_store.upload(
+            _run_async(object_store.upload(
                 settings.S3_ASSETS_BUCKET, img_key, img_bytes, content_type="image/png",
-            )
+            ))
             artifact_keys.append(img_key)
 
             # Asset 등록
-            async with async_session_factory() as db:
+            with SyncSessionLocal() as db:
                 asset = Asset(
                     job_id=uuid.UUID(job_id),
                     asset_type="scene_image",
@@ -301,20 +307,20 @@ async def _images(job_id: str) -> str:
                     is_fallback=is_fallback,
                 )
                 db.add(asset)
-                await db.commit()
+                db.commit()
 
             if cost > 0:
-                await cost_tracker.record_cost(
+                _run_async(cost_tracker.record_cost(
                     job_id=job_id,
                     step_name=step_name,
                     provider="openai_dalle",
                     model=settings.OPENAI_IMAGE_MODEL,
                     cost_usd=cost,
                     image_count=1,
-                )
+                ))
                 total_cost += cost
 
-        await complete_step(
+        complete_step(
             step_id, job_id, step_name,
             progress_percent=75,
             artifact_keys=artifact_keys,
@@ -325,5 +331,5 @@ async def _images(job_id: str) -> str:
         return job_id
 
     except Exception as e:
-        await fail_step(step_id, job_id, step_name, e)
+        fail_step(step_id, job_id, step_name, e)
         raise

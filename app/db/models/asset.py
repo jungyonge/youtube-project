@@ -19,6 +19,7 @@ class Asset(Base):
     mime_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
     duration_sec: Mapped[float | None] = mapped_column(nullable=True)
     is_fallback: Mapped[bool] = mapped_column(default=False)
+    is_deleted: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     job: Mapped["VideoJob"] = relationship(back_populates="assets", lazy="selectin")  # noqa: F821

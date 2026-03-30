@@ -6,15 +6,16 @@ import json
 import uuid
 
 import redis.asyncio as aioredis
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from loguru import logger
 from sse_starlette.sse import EventSourceResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.dependencies import get_current_user
+from app.auth.jwt_handler import decode_access_token
 from app.config import settings
 from app.db.models.user import User
 from app.db.repositories.job_repo import JobRepository
+from app.db.repositories.user_repo import UserRepository
 from app.db.session import get_db
 
 router = APIRouter(prefix="/api/v1/videos", tags=["stream"])
@@ -23,12 +24,62 @@ HEARTBEAT_INTERVAL = 15  # seconds
 CONNECTION_TIMEOUT = 1800  # 30 minutes
 
 
+async def _get_user_from_request(
+    request: Request,
+    token: str | None,
+    db: AsyncSession,
+) -> User:
+    """
+    SSE 토큰 처리: EventSource API는 커스텀 헤더를 지원하지 않으므로,
+    Authorization 헤더와 query parameter 모두에서 JWT를 추출한다.
+
+    1. Authorization 헤더에서 토큰 추출 시도
+    2. 없으면 query parameter 'token'에서 추출
+    3. 둘 다 없으면 401 반환
+    """
+    jwt_token = None
+
+    # 1. Authorization 헤더
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        jwt_token = auth_header.removeprefix("Bearer ")
+
+    # 2. Query parameter fallback
+    if not jwt_token and token:
+        jwt_token = token
+
+    if not jwt_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token required (header or query parameter)",
+        )
+
+    try:
+        payload = decode_access_token(jwt_token)
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        user_repo = UserRepository(db)
+        user = await user_repo.get_by_id(uuid.UUID(user_id))
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        return user
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
 @router.get("/{job_id}/stream")
 async def stream_job_status(
     job_id: uuid.UUID,
-    current_user: User = Depends(get_current_user),
+    request: Request,
+    token: str | None = Query(default=None, description="JWT token (EventSource fallback)"),
     db: AsyncSession = Depends(get_db),
 ) -> EventSourceResponse:
+    # SSE는 커스텀 헤더 미지원 → header + query param 모두 지원
+    current_user = await _get_user_from_request(request, token, db)
+
     # 소유자 확인
     repo = JobRepository(db)
     job = await repo.get_by_id(job_id)

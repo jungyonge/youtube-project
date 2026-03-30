@@ -6,7 +6,6 @@ import hashlib
 import json
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from loguru import logger
@@ -14,7 +13,7 @@ from sqlalchemy import select, update
 
 from app.config import settings
 from app.db.models.source import Source
-from app.db.session import async_session_factory
+from app.db.sync_session import SyncSessionLocal
 from app.pipeline.step_utils import begin_step, check_cancelled, complete_step, fail_step
 from app.storage.object_store import object_store
 from app.workers.celery_app import celery_app
@@ -37,6 +36,20 @@ _AD_KEYWORDS = {
     "광고", "협찬", "제휴", "스폰서", "sponsored", "advertisement", "promotion",
     "할인", "쿠폰", "이벤트", "무료체험", "가입하세요",
 }
+
+
+def _run_async(coro):
+    """Run an async coroutine from sync Celery task context."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
 
 
 def _canonicalize_url(url: str) -> str:
@@ -94,23 +107,15 @@ def _check_ad_ratio(text: str) -> float:
 
 @celery_app.task(name="pipeline.normalize", bind=True, max_retries=0)
 def normalize_task(self, job_id: str) -> str:
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return loop.run_until_complete(_normalize(job_id))
-
-
-async def _normalize(job_id: str) -> str:
     step_name = "normalize"
-    step_id = await begin_step(job_id, step_name)
+    step_id = begin_step(job_id, step_name)
 
     try:
-        if await check_cancelled(job_id):
+        if check_cancelled(job_id):
             raise RuntimeError("Job cancelled")
 
-        async with async_session_factory() as db:
-            result = await db.execute(
+        with SyncSessionLocal() as db:
+            result = db.execute(
                 select(Source).where(Source.job_id == uuid.UUID(job_id))
             )
             sources = list(result.scalars().all())
@@ -123,10 +128,10 @@ async def _normalize(job_id: str) -> str:
             if not source.content_snapshot_key:
                 continue
 
-            # S3에서 스냅샷 로드
-            snapshot_bytes = await object_store.download(
+            # S3에서 스냅샷 로드 (async → _run_async)
+            snapshot_bytes = _run_async(object_store.download(
                 settings.S3_ASSETS_BUCKET, source.content_snapshot_key
-            )
+            ))
             snapshot = json.loads(snapshot_bytes.decode("utf-8"))
             text_content = snapshot.get("text_content", "")
 
@@ -152,9 +157,9 @@ async def _normalize(job_id: str) -> str:
             if ad_ratio >= 0.2:
                 logger.warning("High ad ratio ({:.0%}) for source: {}", ad_ratio, source.original_url[:60])
 
-            # DB 업데이트
-            async with async_session_factory() as db:
-                await db.execute(
+            # DB 업데이트 (sync)
+            with SyncSessionLocal() as db:
+                db.execute(
                     update(Source)
                     .where(Source.id == source.id)
                     .values(
@@ -165,9 +170,9 @@ async def _normalize(job_id: str) -> str:
                         reliability_score=reliability,
                     )
                 )
-                await db.commit()
+                db.commit()
 
-        await complete_step(
+        complete_step(
             step_id, job_id, step_name,
             progress_percent=15,
             metadata={"total_sources": len(sources), "duplicates": duplicates},
@@ -175,5 +180,5 @@ async def _normalize(job_id: str) -> str:
         return job_id
 
     except Exception as e:
-        await fail_step(step_id, job_id, step_name, e)
+        fail_step(step_id, job_id, step_name, e)
         raise

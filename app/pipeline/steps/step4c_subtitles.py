@@ -9,13 +9,26 @@ from loguru import logger
 
 from app.config import settings
 from app.db.models.asset import Asset
-from app.db.session import async_session_factory
+from app.db.sync_session import SyncSessionLocal
 from app.pipeline.models.script import FullScript
 from app.pipeline.step_utils import begin_step, check_cancelled, complete_step, fail_step
 from app.storage.object_store import object_store
 from app.workers.celery_app import celery_app
 
 SUBTITLE_CHUNK_SIZE = 20  # 한국어 최적화 20자
+
+
+def _run_async(coro):
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
 
 
 def _split_text_to_chunks(text: str, chunk_size: int = SUBTITLE_CHUNK_SIZE) -> list[str]:
@@ -80,24 +93,16 @@ def _build_srt(script: FullScript) -> str:
 
 @celery_app.task(name="pipeline.subtitles", bind=True, max_retries=0)
 def subtitle_task(self, job_id: str) -> str:
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return loop.run_until_complete(_subtitles(job_id))
-
-
-async def _subtitles(job_id: str) -> str:
     step_name = "subtitles"
-    step_id = await begin_step(job_id, step_name)
+    step_id = begin_step(job_id, step_name)
 
     try:
-        if await check_cancelled(job_id):
+        if check_cancelled(job_id):
             raise RuntimeError("Job cancelled")
 
         # FullScript 로드
         script_key = f"{job_id}/script.json"
-        script_bytes = await object_store.download(settings.S3_ASSETS_BUCKET, script_key)
+        script_bytes = _run_async(object_store.download(settings.S3_ASSETS_BUCKET, script_key))
         script = FullScript.model_validate(json.loads(script_bytes.decode("utf-8")))
 
         # SRT 생성
@@ -105,15 +110,15 @@ async def _subtitles(job_id: str) -> str:
 
         # S3 업로드
         srt_key = f"{job_id}/subtitles/subtitles.srt"
-        await object_store.upload(
+        _run_async(object_store.upload(
             settings.S3_ASSETS_BUCKET,
             srt_key,
             srt_content.encode("utf-8"),
             content_type="text/plain; charset=utf-8",
-        )
+        ))
 
         # Asset 등록
-        async with async_session_factory() as db:
+        with SyncSessionLocal() as db:
             asset = Asset(
                 job_id=uuid.UUID(job_id),
                 asset_type="subtitle",
@@ -122,9 +127,9 @@ async def _subtitles(job_id: str) -> str:
                 mime_type="text/srt",
             )
             db.add(asset)
-            await db.commit()
+            db.commit()
 
-        await complete_step(
+        complete_step(
             step_id, job_id, step_name,
             progress_percent=80,
             artifact_keys=[srt_key],
@@ -134,5 +139,5 @@ async def _subtitles(job_id: str) -> str:
         return job_id
 
     except Exception as e:
-        await fail_step(step_id, job_id, step_name, e)
+        fail_step(step_id, job_id, step_name, e)
         raise

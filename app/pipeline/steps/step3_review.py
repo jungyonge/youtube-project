@@ -17,39 +17,45 @@ from app.utils.prompts import SCRIPT_REVIEW_PROMPT
 from app.workers.celery_app import celery_app
 
 
-@celery_app.task(name="pipeline.review", bind=True, max_retries=0)
-def review_task(self, job_id: str) -> str:
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
+def _run_async(coro):
+    """Run an async coroutine from sync Celery task context."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-    return loop.run_until_complete(_review(job_id))
+        return loop.run_until_complete(coro)
 
 
-async def _review(job_id: str) -> str:
+@celery_app.task(name="pipeline.review", bind=True, max_retries=0)
+def review_task(self, job_id: str) -> str:
     step_name = "review"
-    step_id = await begin_step(job_id, step_name)
+    step_id = begin_step(job_id, step_name)
 
     try:
-        if await check_cancelled(job_id):
+        if check_cancelled(job_id):
             raise RuntimeError("Job cancelled")
 
         # S3에서 FullScript 로드
         script_key = f"{job_id}/script.json"
-        script_bytes = await object_store.download(settings.S3_ASSETS_BUCKET, script_key)
+        script_bytes = _run_async(object_store.download(settings.S3_ASSETS_BUCKET, script_key))
         script_json = script_bytes.decode("utf-8")
 
         # ChatGPT 검수
         client = OpenAIClient()
         prompt = SCRIPT_REVIEW_PROMPT.format(script_json=script_json)
 
-        resp = await client.chat(
+        resp = _run_async(client.chat(
             messages=[
                 {"role": "system", "content": "당신은 유튜브 영상 대본 검수 전문가입니다. 수정된 JSON만 반환하세요."},
                 {"role": "user", "content": prompt},
             ],
             temperature=0.3,
-        )
+        ))
 
         # JSON 파싱
         review_text = resp.text.strip()
@@ -65,15 +71,15 @@ async def _review(job_id: str) -> str:
             reviewed_script = FullScript.model_validate(json.loads(script_json))
 
         # S3에 덮어쓰기
-        await object_store.upload(
+        _run_async(object_store.upload(
             settings.S3_ASSETS_BUCKET,
             script_key,
             reviewed_script.model_dump_json(indent=2).encode("utf-8"),
             content_type="application/json",
-        )
+        ))
 
         # CostLog 기록
-        await cost_tracker.record_cost(
+        _run_async(cost_tracker.record_cost(
             job_id=job_id,
             step_name=step_name,
             provider="openai_chat",
@@ -81,9 +87,9 @@ async def _review(job_id: str) -> str:
             cost_usd=resp.cost_usd,
             input_tokens=resp.input_tokens,
             output_tokens=resp.output_tokens,
-        )
+        ))
 
-        await complete_step(
+        complete_step(
             step_id, job_id, step_name,
             progress_percent=45,
             artifact_keys=[script_key],
@@ -94,5 +100,5 @@ async def _review(job_id: str) -> str:
         return job_id
 
     except Exception as e:
-        await fail_step(step_id, job_id, step_name, e)
+        fail_step(step_id, job_id, step_name, e)
         raise

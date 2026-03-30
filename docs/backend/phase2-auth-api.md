@@ -62,6 +62,15 @@ class UserRepository:
 2. Redis에 key 존재 여부 체크 (TTL 24시간)
 3. 존재하면 → 기존 응답 반환 (409 또는 cached response)
 4. 없으면 → 처리 후 결과를 Redis에 저장
+
+Race condition 방지:
+- Redis SET NX (존재하지 않을 때만 설정) 사용
+- 동시에 같은 key로 2개 요청이 들어와도 1개만 처리
+- SET NX 성공 시 → 처리 진행 + 결과 저장
+- SET NX 실패 시 → 기존 결과 반환 (polling 필요 시 202)
+
+Redis 키 구조: idempotency:{key} → JSON(job_id, status, response)
+TTL: 24시간 (설정 가능)
 """
 ```
 
@@ -192,6 +201,26 @@ class UserResponse(BaseModel):
     email: str
     role: str
     created_at: datetime
+```
+
+### CORS 설정 (프론트엔드 연동 필수)
+
+`app/main.py`에 CORSMiddleware 추가:
+
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",      # Vite 개발 서버
+        "http://localhost:3000",      # 대체 포트
+        # 프로덕션 시 실제 도메인 추가
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 ```
 
 ---

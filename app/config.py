@@ -21,6 +21,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/video_pipeline"
+    SYNC_DATABASE_URL: str = "postgresql+psycopg2://postgres:password@localhost:5432/video_pipeline"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

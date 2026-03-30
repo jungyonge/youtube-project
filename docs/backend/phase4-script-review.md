@@ -245,6 +245,30 @@ POST /api/v1/videos/{job_id}/reject
 
 ### 파이프라인 모델
 
+**파일**: `app/pipeline/models/assets.py`
+
+```python
+class SceneAssetPlan(BaseModel):
+    """
+    씬별 최적 에셋 전략. DALL-E 이미지만이 아니라 다양한 유형 혼합.
+    """
+    asset_type: Literal[
+        "generated_image",    # DALL-E 생성 이미지
+        "quote_card",         # 인용문 카드 (템플릿 기반)
+        "data_chart",         # 차트/그래프 (matplotlib/Pillow)
+        "timeline_card",      # 타임라인 카드
+        "title_card",         # 제목/섹션 구분 카드
+        "web_capture",        # 원본 웹페이지 스크린샷 (Playwright)
+        "text_overlay",       # 핵심 키워드 강조 화면
+        "split_screen",       # 비교 화면 (좌/우)
+    ]
+    generation_prompt: str | None = None      # generated_image 전용
+    template_id: str | None = None            # 카드 템플릿 ID
+    template_data: dict | None = None         # 템플릿에 채울 데이터
+    fallback_strategy: Literal["placeholder", "text_overlay", "skip"] = "placeholder"
+    priority: int = 1                         # 예산 부족 시 낮은 priority부터 생략
+```
+
 **파일**: `app/pipeline/models/script.py`
 
 ```python
@@ -258,22 +282,28 @@ class SceneClaim(BaseModel):
 class SceneCitation(BaseModel):
     source_domain: str
     source_title: str
-    display_text: str
+    display_text: str             # "출처: 조선일보 (2026.03.28)"
 
 class ScriptScene(BaseModel):
     scene_id: int
     section: str          # hook|intro|body_N|conclusion
-    purpose: str
+    purpose: str          # 이 씬의 목적 (한 줄)
     duration_target_sec: int
     duration_actual_sec: int | None
     narration: str
-    subtitle_chunks: list[str]
+    subtitle_chunks: list[str]    # 자막 분절 (20자 단위)
+
+    # 에셋 계획 (다양한 유형)
     asset_plan: list[SceneAssetPlan]
-    transition_in: str | None
-    transition_out: str | None
+
+    # 전환 효과
+    transition_in: str | None     # 이 씬으로 들어올 때
+    transition_out: str | None    # 이 씬에서 나갈 때
+
+    # 근거/정책
     claims: list[SceneClaim]
     citations: list[SceneCitation]
-    policy_flags: list[str]
+    policy_flags: list[str]       # 아래 정책 플래그 참조
     keywords: list[str]
 
 class FullScript(BaseModel):
@@ -284,10 +314,36 @@ class FullScript(BaseModel):
     scenes: list[ScriptScene]
     tags: list[str]
     description: str
-    overall_sensitivity: Literal["low", "medium", "high"]
-    requires_human_approval: bool
-    policy_warnings: list[str]
+
+    # 정책 메타
+    overall_sensitivity: Literal["low", "medium", "high"] = "low"
+    requires_human_approval: bool = False
+    policy_warnings: list[str] = []
 ```
+
+### 정책 플래그 (policy_flags) 전체 목록
+
+| 플래그 | 트리거 조건 |
+|--------|-------------|
+| `contains_stock_prediction` | 주식/투자 수익률 예측 |
+| `mentions_politician` | 특정 정치인 이름 언급 |
+| `contains_medical_advice` | 건강/의료 조언 |
+| `controversial_claim` | 논란성 주장 (팩트 아닌 강한 주장) |
+
+### 민감도 판정 기준 (overall_sensitivity)
+
+| 수준 | 대상 주제 | 처리 |
+|------|-----------|------|
+| **low** | 기술, 교육, 일반 정보 | 자동 통과 |
+| **medium** | 경제 전망, 사회 이슈 | 자동 통과 (policy_review 실행) |
+| **high** | 정치 논쟁, 투자 조언, 의료 | `requires_human_approval = true` → Human Gate 대기 |
+
+### Disclaimer 씬 자동 삽입
+
+정책 검수 시 아래 조건에 해당하면 영상 **시작 부분**에 disclaimer 씬을 자동 삽입:
+- `contains_stock_prediction` → "이 영상은 투자 권유가 아닙니다" 면책 조항
+- `contains_medical_advice` → "전문의와 상담하세요" 면책 조항
+- 삽입된 씬은 `section="disclaimer"`, `asset_type="title_card"`
 
 ---
 

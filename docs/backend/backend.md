@@ -21,8 +21,9 @@ AI가 자동으로 10~15분 분량의 유튜브 영상(MP4)을 생성하는 Pyth
 - **DB (메타데이터 영속 저장)**: PostgreSQL + SQLAlchemy 2.0 (async) + Alembic (마이그레이션)
 - **Cache / Queue / PubSub**: Redis (Celery 브로커, 휘발성 상태, SSE pub/sub 전용)
 - **Object Storage (산출물)**: MinIO (S3 호환, 로컬 개발) → 프로덕션 시 AWS S3 교체
-- **Task Queue**: Celery + Redis
+- **Task Queue**: Celery + Redis (큐 2개 분리: default + render)
 - **Realtime**: sse-starlette (진행 상태 실시간 푸시)
+- **Sync DB (Worker 전용)**: psycopg2 (Celery 워커는 동기 DB 커넥션 사용)
 - **Video Processing**: MoviePy, FFmpeg
 - **Content Extraction**: BeautifulSoup4, newspaper3k, youtube-transcript-api, yt-dlp (fallback), Playwright (동적 페이지)
 - **AI SDKs**: google-genai (Gemini), openai (ChatGPT/DALL-E/TTS)
@@ -40,6 +41,39 @@ MinIO/S3 = 산출물 저장 (이미지, 오디오, 영상, 대본 JSON)
 ```
 파일 경로 대신 **object key + presigned URL**로 산출물을 관리한다.
 로컬 파일시스템은 **개발 환경 전용**으로만 허용한다.
+
+---
+
+## DB 세션 분리 전략 (치명적 호환성 문제 방지)
+
+```python
+"""
+FastAPI(API 계층)와 Celery(Worker 계층)는 DB 접근 방식이 달라야 한다.
+
+문제:
+  Celery는 태생적으로 동기(Synchronous) 워커다.
+  Celery Task 안에서 비동기 SQLAlchemy 세션(asyncpg)을 호출하면
+  Event Loop 충돌이 발생하거나 Deadlock에 빠진다.
+
+해결: 세션을 두 벌 준비한다.
+
+1. session.py (API 계층 전용 - async)
+   - AsyncSession + asyncpg 드라이버
+   - FastAPI의 Depends()로 주입
+   - DATABASE_URL = "postgresql+asyncpg://..."
+
+2. sync_session.py (Celery Worker 전용 - sync)
+   - Session + psycopg2 드라이버 (또는 psycopg)
+   - Celery task 함수 내부에서 직접 사용
+   - SYNC_DATABASE_URL = "postgresql+psycopg2://..."
+
+규칙:
+  - API 라우트 → session.py의 AsyncSession만 사용
+  - Celery task → sync_session.py의 SyncSession만 사용
+  - 절대로 Celery task 안에서 AsyncSession을 import하지 말 것
+  - requirements.txt에 psycopg2-binary 추가
+"""
+```
 
 ---
 
@@ -93,7 +127,8 @@ ai-video-pipeline/
 │   │
 │   ├── db/
 │   │   ├── __init__.py
-│   │   ├── session.py            # async SQLAlchemy session
+│   │   ├── session.py            # async SQLAlchemy session (API용)
+│   │   ├── sync_session.py       # sync SQLAlchemy session (Celery Worker용)
 │   │   ├── models/
 │   │   │   ├── __init__.py
 │   │   │   ├── user.py           # User
@@ -312,6 +347,7 @@ class Asset(Base):
     mime_type: Mapped[str | None]
     duration_sec: Mapped[float | None]  # 오디오/영상인 경우
     is_fallback: Mapped[bool] = mapped_column(default=False)  # placeholder로 대체된 경우
+    is_deleted: Mapped[bool] = mapped_column(default=False)   # S3에서 삭제됨 (중간 산출물 정리)
     created_at: Mapped[datetime]
     
     job: Mapped["VideoJob"] = relationship(back_populates="assets")
@@ -759,9 +795,13 @@ SceneAssetPlan의 asset_type에 따라 분기:
 ```python
 """
 RenderManifest를 입력받아 최종 영상을 조립한다.
-이 Step은 CPU 바운드이므로 명시적으로 sync worker task로 실행.
-async가 아니다.
+이 Step은 CPU 바운드이므로 render 큐의 sync worker task로 실행.
+concurrency=1이므로 한 번에 한 영상만 렌더링.
 
+@celery_app.task(queue='render', bind=True)
+def assemble_video_task(self, ...):
+
+조립 순서:
 1. S3에서 모든 asset 다운로드 → 로컬 temp
 2. MoviePy로 씬별 클립 생성
 3. Ken Burns 효과 적용 (RenderSceneInstruction 기반)
@@ -773,6 +813,72 @@ async가 아니다.
 9. FFmpeg 최종 인코딩: H.264 1080p 30fps
 10. 최종 MP4를 S3 업로드
 11. 로컬 temp 즉시 삭제
+12. 중간 산출물 S3 정리 (아래 참조)
+
+FFmpeg 실시간 진행률 추적 (중요):
+  MoviePy/FFmpeg가 동기적으로 렌더링하는 동안
+  코드가 블로킹되어 Redis에 진행률을 업데이트할 수 없다.
+  프론트에서 15분 동안 "렌더링 중..." 에서 멈추는 문제 발생.
+
+  해결:
+  - FFmpeg을 subprocess.Popen으로 직접 실행하고
+    -progress pipe:1 옵션으로 진행 상황을 stdout으로 출력
+  - 또는 MoviePy의 logger='bar' 대신 커스텀 proglog 콜백 연결
+  - 별도 스레드에서 stdout을 읽으면서 10초마다 Redis PUBLISH
+  - progress_percent 계산: (처리된_프레임 / 총_프레임) * 100
+  
+  구현 패턴:
+    import subprocess, threading
+
+    def run_ffmpeg_with_progress(cmd, job_id, total_duration_sec):
+        proc = subprocess.Popen(
+            cmd + ['-progress', 'pipe:1', '-nostats'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        
+        def read_progress():
+            current_time = 0
+            for line in proc.stdout:
+                line = line.decode().strip()
+                if line.startswith('out_time_ms='):
+                    current_time = int(line.split('=')[1]) / 1_000_000
+                    percent = min(int(current_time / total_duration_sec * 100), 99)
+                    # 10초마다 Redis PUBLISH
+                    redis.publish(f'job:{job_id}:progress', json.dumps({
+                        'phase': 'assembling_video',
+                        'progress_percent': 80 + (percent * 0.2),  # 전체의 80~100% 구간
+                        'current_step_detail': f'렌더링 {percent}% ({int(current_time)}초/{total_duration_sec}초)'
+                    }))
+        
+        t = threading.Thread(target=read_progress, daemon=True)
+        t.start()
+        proc.wait()
+        t.join(timeout=5)
+
+중간 산출물 S3 정리 (스토리지 비용 최적화):
+  최종 MP4가 S3에 성공적으로 업로드된 후,
+  이 영상을 만드는 데 사용된 중간 산출물을 정리한다.
+
+  즉시 삭제 대상:
+  - tts_audio (씬별 mp3 파일 ~18개)
+  - scene_image (씬별 이미지 파일 ~18개)
+  - subtitle (SRT 파일)
+  - bgm (선택된 BGM 파일)
+
+  유지 대상:
+  - video (최종 MP4) → output TTL(24시간) 후 삭제
+  - thumbnail (썸네일) → output TTL 후 삭제
+  - script JSON → output TTL 후 삭제
+
+  구현:
+  - Asset 테이블에서 해당 job_id의 중간 산출물 조회
+  - S3 batch delete 실행
+  - Asset 레코드의 is_deleted 플래그 업데이트
+  - 삭제된 용량 로깅
+
+  실패 시:
+  - 중간 산출물 삭제 실패는 영상 생성 실패로 처리하지 않음
+  - periodic_tasks의 cleanup에서 재시도
 """
 ```
 
@@ -785,18 +891,24 @@ async가 아니다.
 Celery task 체인으로 파이프라인을 구성한다.
 하나의 거대한 async orchestrator가 아니라, step 단위로 task를 분리.
 
-체인 구성:
-  extract_task.s(job_id)
-  | normalize_task.s()
-  | evidence_pack_task.s()
-  | research_task.s()
-  | review_task.s()
-  | policy_review_task.s()
-  | human_gate_task.s()        # 필요시 여기서 중단
-  | asset_generation_group     # group()으로 4a,4b,4d 병렬
-  | subtitle_task.s()          # 4c는 TTS 완료 후
-  | render_manifest_task.s()   # 렌더 지시서 생성
-  | assemble_task.s()          # sync worker에서 실행
+큐 라우팅:
+  - default 큐: extract, normalize, evidence_pack, research, review,
+                policy_review, human_gate, tts, images, subtitles, bgm,
+                render_manifest
+  - render 큐: assemble (Step 5만 전용 큐)
+
+  체인 내 라우팅 예시:
+    extract_task.s(job_id)
+    | normalize_task.s()
+    | evidence_pack_task.s()
+    | research_task.s()
+    | review_task.s()
+    | policy_review_task.s()
+    | human_gate_task.s()
+    | asset_generation_group       # group()으로 4a,4b,4d 병렬
+    | subtitle_task.s()
+    | render_manifest_task.s()
+    | assemble_task.s().set(queue='render')  # render 큐로 라우팅
 
 각 task는:
 1. 시작 시 JobStepExecution 레코드 생성 (status=running)
@@ -804,11 +916,14 @@ Celery task 체인으로 파이프라인을 구성한다.
 3. 실패 시 status=failed, error 기록
 4. Redis PUBLISH로 SSE 상태 전송
 5. job.is_cancelled 체크 → True면 즉시 중단
+6. DB 접근 시 반드시 sync_session 사용 (Celery 내 async 금지)
 
 비동기/동기 분리:
-- API 계층: async (FastAPI)
-- 네트워크 I/O (AI API 호출, S3): async 가능한 task
-- 렌더/FFmpeg/MoviePy: sync worker task (CPU 바운드)
+- API 계층: async (FastAPI + asyncpg)
+- Celery task 내 AI API 호출: sync 래퍼 사용
+  (openai, google-genai SDK 자체가 sync이므로 그대로 사용 가능)
+  (async SDK 사용 시 asgiref.sync.async_to_sync 래퍼 필수)
+- 렌더/FFmpeg/MoviePy: sync worker task (render 큐, concurrency=1)
 
 Cost Guardrail:
 - 각 AI API 호출 후 cost_tracker로 비용 기록
@@ -961,7 +1076,7 @@ prometheus 메트릭:
 
 ```yaml
 """
-서비스 컨테이너 6개:
+서비스 컨테이너 7개 (렌더 워커 분리):
 
   postgres:
     image: postgres:16-alpine
@@ -984,16 +1099,34 @@ prometheus 메트릭:
     resources: cpus 1.0, memory 512M
     의존: postgres, redis, minio
 
-  worker:
-    Dockerfile.worker (FFmpeg, MoviePy, Playwright 포함)
-    celery worker --concurrency=2
+  worker-default:
+    Dockerfile.worker
+    celery worker --queues=default --concurrency=4
+    resources: cpus 2.0, memory 2G
+    역할: 콘텐츠 추출, AI API 호출, 텍스트 처리 등 경량 task
+    의존: postgres, redis, minio
+
+  worker-render:
+    Dockerfile.worker
+    celery worker --queues=render --concurrency=1
     resources: cpus 4.0, memory 8G
+    역할: 오직 Step 5 영상 조립(FFmpeg/MoviePy)만 전담
+    concurrency=1로 제한하여 OOM 방어
+    (8GB RAM을 한 영상이 독점 사용)
     의존: postgres, redis, minio
 
   beat:
     Dockerfile.worker 재사용
     celery beat
     resources: cpus 0.5, memory 256M
+
+워커 큐 분리 이유:
+  텍스트 추출이나 대본 생성은 메모리를 적게 쓰지만,
+  MoviePy/FFmpeg 렌더링은 메모리를 극도로 많이 사용한다.
+  concurrency=2인 워커에서 영상 2개를 동시에 렌더링하면
+  8GB RAM으로는 OOM으로 컨테이너가 뻗는다.
+  따라서 렌더 전용 큐를 concurrency=1로 분리하여
+  한 번에 한 영상만 렌더링하도록 강제한다.
 """
 ```
 
@@ -1027,6 +1160,46 @@ prometheus 메트릭:
 
 ---
 
+## 프론트엔드 연동 필수 사항
+
+### CORS 설정
+```python
+"""
+main.py에 CORSMiddleware 추가:
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",      # Vite 개발 서버
+        "http://localhost:3000",      # 대체 포트
+        # 프로덕션 시 실제 도메인 추가
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+"""
+```
+
+### SSE 엔드포인트 토큰 처리
+```python
+"""
+EventSource API는 커스텀 헤더를 지원하지 않으므로,
+SSE 엔드포인트는 쿼리 파라미터로도 JWT를 받을 수 있어야 한다.
+
+GET /api/v1/videos/{job_id}/stream?token={jwt}
+
+stream.py에서:
+1. Authorization 헤더에서 토큰 추출 시도
+2. 없으면 query parameter 'token'에서 추출
+3. 둘 다 없으면 401 반환
+"""
+```
+
+---
+
 ## 설정 파일
 
 ### .env.example
@@ -1048,6 +1221,7 @@ OPENAI_IMAGE_SIZE=1792x1024
 
 # Database
 DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/video_pipeline
+SYNC_DATABASE_URL=postgresql+psycopg2://postgres:password@localhost:5432/video_pipeline
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -1137,8 +1311,42 @@ DEFAULT_DAILY_QUOTA=5
 38. Ken Burns 효과
 
 ### Phase 7: 오케스트레이션 + 인프라
-39. orchestrator.py (Celery task 체인)
-40. celery_app.py
+39. orchestrator.py (Celery task 체인 + 큐 라우팅)
+40. celery_app.py (아래 설정 필수 포함)
+
+```python
+"""
+celery_app.py 필수 설정:
+
+# 브로커 타임아웃 (치명적 중복 렌더링 방지)
+# 15분 영상 렌더링에 10~20분 소요.
+# 기본 visibility_timeout(1시간)이 지나면 Redis가
+# "워커가 죽었다"고 판단하여 다른 워커에 작업을 재할당한다.
+# → 동일 영상을 2번 렌더링 = 비용/자원 2배 폭발
+# 따라서 넉넉하게 4시간(14400초)으로 설정.
+broker_transport_options = {
+    'visibility_timeout': 14400,  # 4시간
+}
+
+# 큐 라우팅
+task_routes = {
+    'app.pipeline.steps.step5_assemble.*': {'queue': 'render'},
+    # 나머지는 default 큐 자동
+}
+
+# 렌더 큐 prefetch 제한 (한 번에 1개만 가져옴)
+worker_prefetch_multiplier = 1  # render worker용
+
+# Task 결과 만료 (24시간)
+result_expires = 86400
+
+# 직렬화
+task_serializer = 'json'
+result_serializer = 'json'
+accept_content = ['json']
+"""
+```
+
 41. periodic_tasks.py (파일 정리, API 헬스체크, stale job 정리)
 42. stream.py (SSE)
 43. cancel/retry API 라우트
@@ -1165,19 +1373,25 @@ DEFAULT_DAILY_QUOTA=5
 ## 중요 제약사항
 
 1. **Python 3.11+ 문법** (match-case, type hints, | None 구문)
-2. **API 계층과 네트워크 I/O는 async**, FFmpeg/MoviePy/대용량 파일 처리는 **sync worker task로 분리**
-3. 각 Step은 독립적으로 테스트 가능 (의존성 주입)
-4. 중간 결과물은 S3에 저장하여 재시작/재실행 가능
-5. 비용 추적: 모든 AI API 호출 시 CostLog 기록 + cost_budget 체크
-6. 한국어 최적화: TTS, 자막, 나레이션
-7. Rate Limiting: asyncio.Semaphore + 사용자별 quota
-8. 구조화 로그: loguru + trace_id + job_id
-9. 타입 힌트: 전체 함수, mypy strict
-10. 외부 API 호출은 반드시 retry.py 데코레이터
-11. Docker: API(경량) / Worker(중량) 완전 분리
-12. 로컬 파일시스템은 temp 전용, 영속 데이터는 Postgres + S3
-13. 정치/주식/시사는 별도 policy review, fact/inference/opinion 명시 구분
-14. 모든 다운로드 URL은 presigned URL (인증된 사용자만 접근)
+2. **API 계층은 async(asyncpg)**, Celery Worker는 **sync(psycopg2)** — 절대 혼용 금지
+3. **Celery task 안에서 AsyncSession import 금지** — sync_session.py만 사용
+4. 각 Step은 독립적으로 테스트 가능 (의존성 주입)
+5. 중간 결과물은 S3에 저장하여 재시작/재실행 가능
+6. 비용 추적: 모든 AI API 호출 시 CostLog 기록 + cost_budget 체크
+7. 한국어 최적화: TTS, 자막, 나레이션
+8. Rate Limiting: asyncio.Semaphore + 사용자별 quota
+9. 구조화 로그: loguru + trace_id + job_id
+10. 타입 힌트: 전체 함수, mypy strict
+11. 외부 API 호출은 반드시 retry.py 데코레이터
+12. Docker: API(경량) / Worker-default(경량 task) / Worker-render(영상 전용, concurrency=1) 분리
+13. 로컬 파일시스템은 temp 전용, 영속 데이터는 Postgres + S3
+14. 정치/주식/시사는 별도 policy review, fact/inference/opinion 명시 구분
+15. 모든 다운로드 URL은 presigned URL (인증된 사용자만 접근)
+16. **Celery 브로커 visibility_timeout = 14400초(4시간)** — 렌더링 중복 실행 방지
+17. **Step 5는 render 큐 전용** — assemble_task.s().set(queue='render')
+18. **Step 5 FFmpeg 진행률을 10초마다 Redis PUBLISH** — 프론트 멈춤 방지
+19. **영상 완성 후 중간 산출물(tts, image) S3 즉시 삭제** — 스토리지 비용 최적화
+20. **requirements.txt에 psycopg2-binary 포함** — Celery Worker용 동기 DB 드라이버
 
 ---
 

@@ -56,7 +56,8 @@ Strategies:
 
 2. NewsExtractor
    - newspaper3k 우선
-   - 동적 페이지 → Playwright fallback
+   - 동적 페이지(SPA, JS 렌더링) → Playwright fallback
+   - Playwright는 headless Chromium으로 페이지 완전 로드 후 추출
 
 3. YouTubeExtractor
    - youtube-transcript-api로 자막 추출
@@ -129,7 +130,7 @@ Flow:
    - 30일 이상 경과 기사 → recency 페널티
 
 4. 광고성/홍보성 필터
-   - 광고 키워드 비율 20% 이상 → warning flag
+   - 광고 키워드 비율이 설정값(config.AD_KEYWORD_THRESHOLD, 기본 20%) 이상 → warning flag
 
 5. Source 테이블 업데이트
 6. JobStepExecution 완료 처리 (progress 15%)

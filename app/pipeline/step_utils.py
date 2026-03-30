@@ -1,4 +1,8 @@
-"""파이프라인 Step 공통 유틸리티: step 실행 기록, 진행률 발행."""
+"""파이프라인 Step 공통 유틸리티: step 실행 기록, 진행률 발행.
+
+Celery Worker 전용 — 모든 함수는 동기(sync)로 구현.
+절대로 AsyncSession을 사용하지 않는다.
+"""
 from __future__ import annotations
 
 import json
@@ -6,25 +10,20 @@ import traceback
 import uuid
 from datetime import datetime, timezone
 
-import redis.asyncio as aioredis
+import redis as sync_redis
 from loguru import logger
-from sqlalchemy import update
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.utils.metrics import active_celery_tasks, video_jobs_total
+from sqlalchemy import select, update
 
 from app.config import settings
 from app.db.models.job_step import JobStepExecution
 from app.db.models.video_job import VideoJob
-from app.db.session import async_session_factory
+from app.db.sync_session import SyncSessionLocal
+from app.utils.metrics import active_celery_tasks, video_jobs_total
 
 
-async def get_session() -> AsyncSession:
-    return async_session_factory()
-
-
-async def begin_step(job_id: str, step_name: str) -> uuid.UUID:
-    async with async_session_factory() as db:
+def begin_step(job_id: str, step_name: str) -> uuid.UUID:
+    """Step 시작 기록."""
+    with SyncSessionLocal() as db:
         step = JobStepExecution(
             job_id=uuid.UUID(job_id),
             step_name=step_name,
@@ -32,14 +31,14 @@ async def begin_step(job_id: str, step_name: str) -> uuid.UUID:
             started_at=datetime.now(timezone.utc),
         )
         db.add(step)
-        await db.commit()
-        await db.refresh(step)
+        db.commit()
+        db.refresh(step)
         active_celery_tasks.inc()
         logger.info("Step started: job={} step={}", job_id, step_name)
         return step.id
 
 
-async def complete_step(
+def complete_step(
     step_id: str | uuid.UUID,
     job_id: str,
     step_name: str,
@@ -48,10 +47,11 @@ async def complete_step(
     cost_usd: float = 0.0,
     metadata: dict | None = None,
 ) -> None:
+    """Step 완료 기록 + 진행률 업데이트."""
     now = datetime.now(timezone.utc)
-    async with async_session_factory() as db:
+    with SyncSessionLocal() as db:
         step_uuid = uuid.UUID(step_id) if isinstance(step_id, str) else step_id
-        await db.execute(
+        db.execute(
             update(JobStepExecution)
             .where(JobStepExecution.id == step_uuid)
             .values(
@@ -62,7 +62,7 @@ async def complete_step(
                 metadata_json=metadata,
             )
         )
-        await db.execute(
+        db.execute(
             update(VideoJob)
             .where(VideoJob.id == uuid.UUID(job_id))
             .values(
@@ -72,24 +72,25 @@ async def complete_step(
                 updated_at=now,
             )
         )
-        await db.commit()
+        db.commit()
     active_celery_tasks.dec()
     video_jobs_total.labels(status="running").inc(0)  # ensure label exists
     logger.info("Step completed: job={} step={} progress={}%", job_id, step_name, progress_percent)
-    await publish_progress(job_id, progress_percent, f"{step_name} completed")
+    publish_progress(job_id, progress_percent, f"{step_name} completed")
 
 
-async def fail_step(
+def fail_step(
     step_id: str | uuid.UUID,
     job_id: str,
     step_name: str,
     error: Exception,
 ) -> None:
+    """Step 실패 기록."""
     now = datetime.now(timezone.utc)
     tb = traceback.format_exception(type(error), error, error.__traceback__)
-    async with async_session_factory() as db:
+    with SyncSessionLocal() as db:
         step_uuid = uuid.UUID(step_id) if isinstance(step_id, str) else step_id
-        await db.execute(
+        db.execute(
             update(JobStepExecution)
             .where(JobStepExecution.id == step_uuid)
             .values(
@@ -99,7 +100,7 @@ async def fail_step(
                 error_traceback="".join(tb),
             )
         )
-        await db.execute(
+        db.execute(
             update(VideoJob)
             .where(VideoJob.id == uuid.UUID(job_id))
             .values(
@@ -108,32 +109,33 @@ async def fail_step(
                 updated_at=now,
             )
         )
-        await db.commit()
+        db.commit()
     active_celery_tasks.dec()
     video_jobs_total.labels(status="failed").inc()
     logger.error("Step failed: job={} step={} error={}", job_id, step_name, error)
 
 
-async def check_cancelled(job_id: str) -> bool:
-    async with async_session_factory() as db:
-        from sqlalchemy import select
-        result = await db.execute(
+def check_cancelled(job_id: str) -> bool:
+    """Job 취소 여부 확인."""
+    with SyncSessionLocal() as db:
+        result = db.execute(
             select(VideoJob.is_cancelled).where(VideoJob.id == uuid.UUID(job_id))
         )
         cancelled = result.scalar_one_or_none()
         return bool(cancelled)
 
 
-async def publish_progress(job_id: str, progress_percent: int, detail: str) -> None:
+def publish_progress(job_id: str, progress_percent: int, detail: str) -> None:
+    """Redis PUBLISH로 SSE 진행 상태 전송."""
     try:
-        r = aioredis.from_url(settings.REDIS_URL)
+        r = sync_redis.from_url(settings.REDIS_URL)
         event = json.dumps({
             "type": "progress",
             "job_id": job_id,
             "progress_percent": progress_percent,
             "current_step_detail": detail,
         })
-        await r.publish(f"video_job:{job_id}", event)
-        await r.aclose()
+        r.publish(f"video_job:{job_id}", event)
+        r.close()
     except Exception as e:
         logger.warning("Failed to publish progress: {}", e)

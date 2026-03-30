@@ -19,6 +19,7 @@ pytest fixture 모음.
 DB Fixture:
 - async_engine: 테스트용 PostgreSQL (또는 SQLite async)
 - async_session: 트랜잭션 격리 세션 (테스트 후 rollback)
+- sync_session: Celery task 테스트용 동기 세션 (psycopg2)
 - create_tables: 테스트 시작 시 테이블 생성
 
 Redis Fixture:
@@ -119,6 +120,13 @@ ChatGPT, TTS, DALL-E 각각에 대해:
 - test_subtitle_burn: SRT 자막 burn-in 포함 확인
 - test_bgm_mixing: BGM 볼륨 -20dB 믹싱 확인
 - test_temp_cleanup: 조립 후 로컬 temp 파일 삭제 확인
+- test_ffmpeg_progress: FFmpeg 진행률 Redis PUBLISH 확인
+- test_intermediate_cleanup: 완성 후 중간 산출물(tts, image) S3 삭제 + is_deleted 플래그
+
+FFmpeg/MoviePy Mock:
+- MoviePy의 VideoClip/AudioClip을 mock하여 빠른 테스트
+- FFmpeg subprocess를 mock하여 진행률 콜백 테스트
+- 짧은 테스트 영상(1~3초)으로 실제 인코딩 통합 테스트
 """
 ```
 

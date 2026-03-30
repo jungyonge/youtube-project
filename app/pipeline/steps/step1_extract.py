@@ -11,33 +11,39 @@ from sqlalchemy import select, update
 from app.config import settings
 from app.db.models.source import Source
 from app.db.models.video_job import VideoJob
-from app.db.session import async_session_factory
+from app.db.sync_session import SyncSessionLocal
 from app.pipeline.step_utils import begin_step, check_cancelled, complete_step, fail_step
-from app.services.content_extractor import ContentExtractorService, ExtractedContent
+from app.services.content_extractor import ContentExtractorService
 from app.storage.object_store import object_store
 from app.workers.celery_app import celery_app
 
 
-@celery_app.task(name="pipeline.extract", bind=True, max_retries=0)
-def extract_task(self, job_id: str) -> str:
-    loop = asyncio.get_event_loop()
-    if loop.is_closed():
+def _run_async(coro):
+    """Run an async coroutine from sync Celery task context."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        return loop.run_until_complete(coro)
+    except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-    return loop.run_until_complete(_extract(job_id))
+        return loop.run_until_complete(coro)
 
 
-async def _extract(job_id: str) -> str:
+@celery_app.task(name="pipeline.extract", bind=True, max_retries=0)
+def extract_task(self, job_id: str) -> str:
     step_name = "extract"
-    step_id = await begin_step(job_id, step_name)
+    step_id = begin_step(job_id, step_name)
 
     try:
-        if await check_cancelled(job_id):
+        if check_cancelled(job_id):
             raise RuntimeError("Job cancelled")
 
-        # Load sources
-        async with async_session_factory() as db:
-            result = await db.execute(
+        # Load sources (sync DB)
+        with SyncSessionLocal() as db:
+            result = db.execute(
                 select(Source).where(Source.job_id == uuid.UUID(job_id))
             )
             sources = list(result.scalars().all())
@@ -51,10 +57,10 @@ async def _extract(job_id: str) -> str:
 
         for source in sources:
             try:
-                content = await extractor.extract(
+                content = _run_async(extractor.extract(
                     url=source.original_url,
                     source_type=source.source_type,
-                )
+                ))
 
                 # S3에 스냅샷 저장
                 snapshot_key = f"{job_id}/snapshots/{source.id}.json"
@@ -68,17 +74,17 @@ async def _extract(job_id: str) -> str:
                     "published_date": content.published_date.isoformat() if content.published_date else None,
                 }, ensure_ascii=False)
 
-                await object_store.upload(
+                _run_async(object_store.upload(
                     settings.S3_ASSETS_BUCKET,
                     snapshot_key,
                     snapshot_data.encode("utf-8"),
                     content_type="application/json",
-                )
+                ))
                 artifact_keys.append(snapshot_key)
 
-                # Source 레코드 업데이트
-                async with async_session_factory() as db:
-                    await db.execute(
+                # Source 레코드 업데이트 (sync DB)
+                with SyncSessionLocal() as db:
+                    db.execute(
                         update(Source)
                         .where(Source.id == source.id)
                         .values(
@@ -90,7 +96,7 @@ async def _extract(job_id: str) -> str:
                             content_snapshot_key=snapshot_key,
                         )
                     )
-                    await db.commit()
+                    db.commit()
 
                 success_count += 1
                 logger.info(
@@ -107,7 +113,7 @@ async def _extract(job_id: str) -> str:
         if success_count == 0:
             raise RuntimeError("All source extractions failed")
 
-        await complete_step(
+        complete_step(
             step_id, job_id, step_name,
             progress_percent=10,
             artifact_keys=artifact_keys,
@@ -116,5 +122,5 @@ async def _extract(job_id: str) -> str:
         return job_id
 
     except Exception as e:
-        await fail_step(step_id, job_id, step_name, e)
+        fail_step(step_id, job_id, step_name, e)
         raise

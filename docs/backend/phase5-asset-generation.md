@@ -93,10 +93,15 @@ Flow:
 6. CostLog 기록
 7. JobStepExecution 완료 (progress 75%)
 
-Cost Guardrail 적용:
-- 예산 80% 도달 → priority 낮은 generated_image를 text_overlay로 대체
-- 예산 90% 도달 → 모든 generated_image를 text_overlay로 대체
-- placeholder 사용 시 Asset.is_fallback = True
+동시 요청 제한:
+- asyncio.Semaphore(settings.MAX_CONCURRENT_IMAGE_REQUESTS)로 DALL-E 동시 요청 제한 (기본 5)
+
+Cost Guardrail 적용 (4단계 자동 Degradation):
+- 1단계 (예산 80%): DALL-E 이미지 수 50% 감소 (priority 낮은 씬 → text_overlay)
+- 2단계 (예산 90%): Gemini Pro → Flash 다운그레이드
+- 3단계 (예산 95%): 나머지 이미지 전부 text_overlay로 대체
+- 4단계 (예산 100%): job 실패 처리 + 사용자에게 예산 부족 알림
+- placeholder/text_overlay 사용 시 Asset.is_fallback = True
 
 에러 처리:
 - DALL-E 실패 → fallback_strategy 적용:

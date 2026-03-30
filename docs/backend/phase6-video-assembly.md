@@ -151,6 +151,69 @@ Flow:
 - MoviePy/FFmpeg 에러 → 상세 로그 + step 실패
 - 디스크 공간 부족 → 사전 체크 + 에러 처리
 - 로컬 temp는 성공/실패 관계없이 finally에서 삭제
+
+FFmpeg 실시간 진행률 추적 (프론트 멈춤 방지):
+  MoviePy/FFmpeg가 동기적으로 렌더링하는 동안
+  코드가 블로킹되어 Redis에 진행률을 업데이트할 수 없다.
+  프론트에서 15분 동안 "렌더링 중..." 에서 멈추는 문제 발생.
+
+  해결:
+  - FFmpeg을 subprocess.Popen으로 직접 실행하고
+    -progress pipe:1 옵션으로 진행 상황을 stdout으로 출력
+  - 별도 스레드에서 stdout을 읽으면서 10초마다 Redis PUBLISH
+  - progress_percent 계산: (처리된_프레임 / 총_프레임) * 100
+
+  구현 패턴:
+    import subprocess, threading
+
+    def run_ffmpeg_with_progress(cmd, job_id, total_duration_sec):
+        proc = subprocess.Popen(
+            cmd + ['-progress', 'pipe:1', '-nostats'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+
+        def read_progress():
+            current_time = 0
+            for line in proc.stdout:
+                line = line.decode().strip()
+                if line.startswith('out_time_ms='):
+                    current_time = int(line.split('=')[1]) / 1_000_000
+                    percent = min(int(current_time / total_duration_sec * 100), 99)
+                    redis.publish(f'job:{job_id}:progress', json.dumps({
+                        'phase': 'assembling_video',
+                        'progress_percent': 80 + (percent * 0.2),
+                        'current_step_detail': f'렌더링 {percent}%'
+                    }))
+
+        t = threading.Thread(target=read_progress, daemon=True)
+        t.start()
+        proc.wait()
+        t.join(timeout=5)
+
+중간 산출물 S3 정리 (스토리지 비용 최적화):
+  최종 MP4가 S3에 성공적으로 업로드된 후,
+  이 영상을 만드는 데 사용된 중간 산출물을 정리한다.
+
+  즉시 삭제 대상:
+  - tts_audio (씬별 mp3 파일 ~18개)
+  - scene_image (씬별 이미지 파일 ~18개)
+  - subtitle (SRT 파일)
+  - bgm (선택된 BGM 파일)
+
+  유지 대상:
+  - video (최종 MP4) → OUTPUT_TTL_HOURS(24시간) 후 삭제
+  - thumbnail (썸네일) → OUTPUT_TTL_HOURS 후 삭제
+  - script JSON → OUTPUT_TTL_HOURS 후 삭제
+
+  구현:
+  - Asset 테이블에서 해당 job_id의 중간 산출물 조회
+  - S3 batch delete 실행
+  - Asset 레코드의 is_deleted = True 플래그 업데이트
+  - 삭제된 용량 로깅
+
+  실패 시:
+  - 중간 산출물 삭제 실패는 영상 생성 실패로 처리하지 않음
+  - periodic_tasks의 cleanup에서 재시도
 """
 ```
 
@@ -192,5 +255,7 @@ Flow:
 - [ ] `step5_assemble.py` — 전체 에셋 조립 → MP4 생성 + S3 업로드
 - [ ] 최종 영상: H.264, 1080p, 30fps, AAC 192kbps
 - [ ] 썸네일 생성 + S3 업로드
+- [ ] FFmpeg 실시간 진행률 → Redis PUBLISH (10초 간격)
+- [ ] 중간 산출물(tts, image, subtitle, bgm) S3 즉시 삭제 + is_deleted 플래그
 - [ ] 로컬 temp 파일 정리 확인
 - [ ] VideoJob 상태 "completed" + presigned download URL 발급

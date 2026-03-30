@@ -34,16 +34,36 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
 
         try:
             r = await self._get_redis()
-            cached = await r.get(redis_key)
-            if cached:
-                logger.info("Idempotency hit for key={}", idem_key)
-                data = json.loads(cached)
-                return JSONResponse(
-                    content=data["body"],
-                    status_code=data["status_code"],
-                    headers={"X-Idempotency-Replay": "true"},
-                )
 
+            # SET NX로 race condition 방지:
+            # 동시에 같은 key로 2개 요청이 들어와도 1개만 처리
+            acquired = await r.set(
+                redis_key,
+                json.dumps({"status": "processing"}),
+                ex=IDEMPOTENCY_TTL,
+                nx=True,
+            )
+
+            if not acquired:
+                # 이미 존재하는 key — 캐시된 응답 또는 처리 중
+                cached = await r.get(redis_key)
+                if cached:
+                    data = json.loads(cached)
+                    if data.get("status") == "processing":
+                        # 다른 요청이 아직 처리 중
+                        return JSONResponse(
+                            content={"detail": "Request is being processed", "idempotency_key": idem_key},
+                            status_code=202,
+                            headers={"X-Idempotency-Processing": "true"},
+                        )
+                    logger.info("Idempotency hit for key={}", idem_key)
+                    return JSONResponse(
+                        content=data["body"],
+                        status_code=data["status_code"],
+                        headers={"X-Idempotency-Replay": "true"},
+                    )
+
+            # SET NX 성공 — 이 요청이 처리 담당
             response = await call_next(request)
 
             # Cache successful responses
@@ -62,6 +82,8 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
                     headers=dict(response.headers),
                 )
 
+            # 실패 시 key 삭제하여 재시도 허용
+            await r.delete(redis_key)
             return response
 
         except Exception as e:

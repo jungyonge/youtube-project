@@ -62,6 +62,45 @@ def override_db(db_session):
 
 
 # ---------------------------------------------------------------------------
+# Sync DB session (Celery task 테스트용)
+# ---------------------------------------------------------------------------
+@pytest.fixture
+def sync_db_session(test_engine):
+    """Celery task 테스트를 위한 동기 DB 세션.
+
+    SyncSessionLocal을 mock하여 테스트용 동기 세션을 주입한다.
+    """
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session, sessionmaker
+
+    sync_engine = create_engine("sqlite:///test.db", echo=False)
+    SyncTestSession = sessionmaker(bind=sync_engine, class_=Session, expire_on_commit=False)
+    session = SyncTestSession()
+    yield session
+    session.rollback()
+    session.close()
+
+
+@pytest.fixture
+def override_sync_session(sync_db_session):
+    """Override SyncSessionLocal for pipeline step tests."""
+    from unittest.mock import patch
+
+    class MockSessionLocal:
+        def __enter__(self):
+            return sync_db_session
+
+        def __exit__(self, *args):
+            pass
+
+        def __call__(self):
+            return self
+
+    with patch("app.db.sync_session.SyncSessionLocal", MockSessionLocal):
+        yield sync_db_session
+
+
+# ---------------------------------------------------------------------------
 # API client
 # ---------------------------------------------------------------------------
 @pytest_asyncio.fixture
