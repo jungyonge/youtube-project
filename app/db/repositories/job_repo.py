@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.db.models.job_step import JobStepExecution
 from app.db.models.source import Source
 from app.db.models.video_job import VideoJob
 
@@ -78,6 +79,20 @@ class JobRepository:
             .order_by(VideoJob.created_at.desc())
             .offset(skip)
             .limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def count_by_user(self, user_id: uuid.UUID) -> int:
+        result = await self._db.execute(
+            select(func.count(VideoJob.id)).where(VideoJob.user_id == user_id)
+        )
+        return result.scalar_one()
+
+    async def get_steps(self, job_id: uuid.UUID) -> list[JobStepExecution]:
+        result = await self._db.execute(
+            select(JobStepExecution)
+            .where(JobStepExecution.job_id == job_id)
+            .order_by(JobStepExecution.created_at)
         )
         return list(result.scalars().all())
 

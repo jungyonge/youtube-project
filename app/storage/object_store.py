@@ -69,6 +69,8 @@ class ObjectStore:
             Params={"Bucket": bucket, "Key": key},
             ExpiresIn=expires_in,
         )
+        if settings.S3_PUBLIC_URL:
+            url = url.replace(settings.S3_ENDPOINT_URL, settings.S3_PUBLIC_URL)
         return url
 
     async def delete(self, bucket: str, key: str) -> None:

@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.schemas.response import JobStatusResponse
+from app.api.schemas.response import JobStatusResponse, JobStepResponse
 from app.auth.dependencies import get_current_user
 from app.config import settings
 from app.db.models.user import User
@@ -59,3 +59,32 @@ async def get_job_status(
         download_url=download_url,
         script_preview_url=script_preview_url,
     )
+
+
+@router.get("/{job_id}/steps", response_model=list[JobStepResponse])
+async def get_job_steps(
+    job_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[JobStepResponse]:
+    repo = JobRepository(db)
+    job = await repo.get_by_id(job_id)
+
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    if job.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    steps = await repo.get_steps(job_id)
+    return [
+        JobStepResponse(
+            step_name=s.step_name,
+            status=s.status,
+            started_at=s.started_at,
+            completed_at=s.completed_at,
+            duration_sec=s.duration_sec,
+            cost_usd=s.cost_usd,
+            error_message=s.error_message,
+        )
+        for s in steps
+    ]

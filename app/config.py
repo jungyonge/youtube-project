@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     S3_SECRET_KEY: str = "minioadmin"
     S3_ASSETS_BUCKET: str = "video-pipeline-assets"
     S3_OUTPUTS_BUCKET: str = "video-pipeline-outputs"
+    S3_PUBLIC_URL: str = ""  # Browser-accessible MinIO URL (e.g., http://localhost:9000)
 
     # App
     TEMP_DIR: str = "./temp"

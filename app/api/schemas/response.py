@@ -7,6 +7,8 @@ class UserResponse(BaseModel):
     id: str
     email: str
     role: str
+    daily_quota: int = 5
+    today_usage: int = 0
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -15,6 +17,7 @@ class UserResponse(BaseModel):
 class AuthTokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user: UserResponse
 
 
 class JobCreateResponse(BaseModel):
@@ -40,3 +43,23 @@ class JobStatusResponse(BaseModel):
     script_preview_url: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class JobStepResponse(BaseModel):
+    step_name: str
+    status: str
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    duration_sec: float | None = None
+    cost_usd: float = 0.0
+    error_message: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class PaginatedResponse(BaseModel):
+    items: list
+    total: int
+    page: int
+    size: int
+    has_next: bool

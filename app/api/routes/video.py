@@ -5,15 +5,68 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas.request import VideoGenerationRequest
-from app.api.schemas.response import JobCreateResponse
+from app.api.schemas.response import JobCreateResponse, JobStatusResponse, PaginatedResponse
 from app.auth.dependencies import get_current_user
 from app.config import settings
 from app.db.models.user import User
 from app.db.repositories.job_repo import JobRepository
 from app.db.repositories.user_repo import UserRepository
 from app.db.session import get_db
+from app.storage.object_store import object_store
 
 router = APIRouter(prefix="/api/v1/videos", tags=["videos"])
+
+
+@router.get("", response_model=PaginatedResponse)
+async def list_videos(
+    page: int = 1,
+    size: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> PaginatedResponse:
+    repo = JobRepository(db)
+    skip = (page - 1) * size
+    jobs = await repo.list_by_user(current_user.id, skip=skip, limit=size)
+    total = await repo.count_by_user(current_user.id)
+
+    items = []
+    for job in jobs:
+        download_url = None
+        script_preview_url = None
+        if job.output_video_key and job.phase == "completed":
+            download_url = await object_store.presigned_url(
+                settings.S3_OUTPUTS_BUCKET, job.output_video_key
+            )
+        if job.output_script_key:
+            script_preview_url = await object_store.presigned_url(
+                settings.S3_ASSETS_BUCKET, job.output_script_key
+            )
+        items.append(
+            JobStatusResponse(
+                job_id=str(job.id),
+                phase=job.phase,
+                progress_percent=job.progress_percent,
+                current_step_detail=job.current_step_detail,
+                is_cancelled=job.is_cancelled,
+                requires_human_approval=job.requires_human_approval,
+                human_approved=job.human_approved,
+                total_cost_usd=job.total_cost_usd,
+                cost_budget_usd=job.cost_budget_usd,
+                attempt_count=job.attempt_count,
+                created_at=job.created_at,
+                updated_at=job.updated_at,
+                download_url=download_url,
+                script_preview_url=script_preview_url,
+            )
+        )
+
+    return PaginatedResponse(
+        items=items,
+        total=total,
+        page=page,
+        size=size,
+        has_next=(skip + size) < total,
+    )
 
 
 @router.post("", response_model=JobCreateResponse, status_code=status.HTTP_201_CREATED)
