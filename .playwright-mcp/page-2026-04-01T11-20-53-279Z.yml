@@ -1,0 +1,7 @@
+- generic [ref=e2]:
+  - generic [ref=e130]:
+    - img [ref=e131]
+    - heading "오류가 발생했습니다" [level=2] [ref=e133]
+    - paragraph [ref=e134]: Cannot read properties of undefined (reading 'toFixed')
+    - button "새로고침" [ref=e135] [cursor=pointer]
+  - region "Notifications alt+T"

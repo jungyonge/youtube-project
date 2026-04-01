@@ -1,9 +1,17 @@
+import hashlib
+import base64
+
 import bcrypt
 
 
+def _prehash(plain: str) -> bytes:
+    """SHA-256 pre-hash to handle passwords longer than bcrypt's 72-byte limit."""
+    return base64.b64encode(hashlib.sha256(plain.encode("utf-8")).digest())
+
+
 def hash_password(plain: str) -> str:
-    return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    return bcrypt.hashpw(_prehash(plain), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    return bcrypt.checkpw(_prehash(plain), hashed.encode("utf-8"))

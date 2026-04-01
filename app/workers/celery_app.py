@@ -9,6 +9,9 @@ celery_app = Celery(
 )
 
 celery_app.conf.update(
+    # 기본 큐를 'default'로 설정 (워커가 --queues=default로 리슨)
+    task_default_queue="default",
+
     # 직렬화
     task_serializer="json",
     result_serializer="json",
@@ -40,4 +43,19 @@ celery_app.conf.update(
     result_expires=86400,
 )
 
-celery_app.autodiscover_tasks(["app.pipeline.steps"])
+celery_app.autodiscover_tasks(["app.pipeline.steps"], related_name=None)
+
+# Explicitly import all step modules so tasks are registered
+import app.pipeline.steps.step1_extract  # noqa: F401,E402
+import app.pipeline.steps.step1b_normalize  # noqa: F401,E402
+import app.pipeline.steps.step1c_evidence_pack  # noqa: F401,E402
+import app.pipeline.steps.step2_research  # noqa: F401,E402
+import app.pipeline.steps.step3_review  # noqa: F401,E402
+import app.pipeline.steps.step3b_policy_review  # noqa: F401,E402
+import app.pipeline.steps.step3c_human_gate  # noqa: F401,E402
+import app.pipeline.steps.step4a_tts  # noqa: F401,E402
+import app.pipeline.steps.step4b_images  # noqa: F401,E402
+import app.pipeline.steps.step4c_subtitles  # noqa: F401,E402
+import app.pipeline.steps.step4d_bgm  # noqa: F401,E402
+import app.pipeline.steps.step5_assemble  # noqa: F401,E402
+import app.workers.periodic_tasks  # noqa: F401,E402

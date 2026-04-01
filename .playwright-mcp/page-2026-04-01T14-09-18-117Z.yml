@@ -1,0 +1,251 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: AI Video Studio
+        - button [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+      - navigation [ref=e11]:
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e13]
+          - generic [ref=e18]: 대시보드
+        - link "내 영상" [ref=e19] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e20]
+          - generic [ref=e22]: 내 영상
+        - link "관리" [ref=e23] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e24]
+          - generic [ref=e26]: 관리
+      - generic [ref=e27]:
+        - button "다크 모드" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+          - generic [ref=e31]: 다크 모드
+        - generic [ref=e32]: test@example.com
+        - button "로그아웃" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e37]: 로그아웃
+    - generic [ref=e38]:
+      - banner [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: 오늘 21/50
+          - generic [ref=e42]: test@example.com
+      - main [ref=e43]:
+        - generic [ref=e44]:
+          - heading "대시보드" [level=1] [ref=e45]
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - generic [ref=e49]: 영상 생성
+              - generic [ref=e51]:
+                - generic [ref=e52]:
+                  - text: 주제
+                  - textbox "주제" [ref=e53]:
+                    - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                    - text: 2024년 한국 스타트업 생태계 현황과 전망
+                - generic [ref=e54]:
+                  - text: 소스
+                  - generic [ref=e55]:
+                    - generic [ref=e56]:
+                      - generic [ref=e57]:
+                        - combobox [ref=e58] [cursor=pointer]:
+                          - generic: 블로그
+                          - img [ref=e59]
+                        - combobox [ref=e61]
+                      - textbox "https://..." [ref=e64]: https://example.com/startup-ecosystem
+                      - button [ref=e317] [cursor=pointer]:
+                        - img [ref=e318]
+                    - generic [ref=e321]:
+                      - generic [ref=e322]:
+                        - combobox [ref=e323] [cursor=pointer]:
+                          - generic: 뉴스
+                          - img [ref=e324]
+                        - combobox [ref=e326]
+                      - textbox "https://..." [ref=e329]: https://example.com/startup-news
+                      - button [ref=e330] [cursor=pointer]:
+                        - img [ref=e331]
+                    - generic [ref=e350]:
+                      - generic [ref=e351]:
+                        - combobox [ref=e352] [cursor=pointer]:
+                          - generic: 블로그
+                          - img [ref=e353]
+                        - combobox [ref=e355]
+                      - textbox "https://..." [active] [ref=e358]
+                      - button [ref=e359] [cursor=pointer]:
+                        - img [ref=e360]
+                    - button "소스 추가" [ref=e65] [cursor=pointer]:
+                      - img [ref=e66]
+                      - text: 소스 추가
+                - generic [ref=e67]:
+                  - text: 스타일
+                  - generic [ref=e68]:
+                    - button "정보 전달 객관적 사실 중심" [ref=e69] [cursor=pointer]:
+                      - img [ref=e70]
+                      - generic [ref=e72]:
+                        - generic [ref=e73]: 정보 전달
+                        - generic [ref=e74]: 객관적 사실 중심
+                    - button "스토리텔링 이야기 구조" [ref=e75] [cursor=pointer]:
+                      - img [ref=e76]
+                      - generic [ref=e81]:
+                        - generic [ref=e82]: 스토리텔링
+                        - generic [ref=e83]: 이야기 구조
+                    - button "튜토리얼 단계별 설명" [ref=e84] [cursor=pointer]:
+                      - img [ref=e85]
+                      - generic [ref=e88]:
+                        - generic [ref=e89]: 튜토리얼
+                        - generic [ref=e90]: 단계별 설명
+                    - button "오피니언 관점 제시" [ref=e91] [cursor=pointer]:
+                      - img [ref=e92]
+                      - generic [ref=e94]:
+                        - generic [ref=e95]: 오피니언
+                        - generic [ref=e96]: 관점 제시
+                - button "고급 설정" [ref=e97] [cursor=pointer]:
+                  - text: 고급 설정
+                  - img [ref=e98]
+                - button "영상 생성 시작" [ref=e100] [cursor=pointer]
+            - generic [ref=e101]:
+              - heading "내 영상" [level=2] [ref=e102]
+              - generic [ref=e103]:
+                - generic [ref=e105] [cursor=pointer]:
+                  - generic [ref=e106]:
+                    - generic [ref=e107]: 실패
+                    - generic [ref=e108]: 약 9시간 전
+                  - generic [ref=e111]:
+                    - generic [ref=e112]: "extract failed: All source extractions failed"
+                    - generic [ref=e113]: $0.00 / $2.00
+                - generic [ref=e115] [cursor=pointer]:
+                  - generic [ref=e116]:
+                    - generic [ref=e117]: 실패
+                    - generic [ref=e118]: 약 9시간 전
+                  - generic [ref=e121]:
+                    - generic [ref=e122]: "extract failed: All source extractions failed"
+                    - generic [ref=e123]: $0.00 / $2.00
+                - generic [ref=e125] [cursor=pointer]:
+                  - generic [ref=e126]:
+                    - generic [ref=e127]: 실패
+                    - generic [ref=e128]: 약 9시간 전
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: "extract failed: Job cancelled"
+                    - generic [ref=e134]: $0.01 / $2.00
+                - generic [ref=e136] [cursor=pointer]:
+                  - generic [ref=e137]:
+                    - generic [ref=e138]: 실패
+                    - generic [ref=e139]: 약 10시간 전
+                  - generic [ref=e143]:
+                    - generic [ref=e144]: "research failed: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To mo"
+                    - generic [ref=e145]: $0.01 / $2.00
+                - generic [ref=e147] [cursor=pointer]:
+                  - generic [ref=e148]:
+                    - generic [ref=e149]: 실패
+                    - generic [ref=e150]: 약 10시간 전
+                  - generic [ref=e154]:
+                    - generic [ref=e155]: "research failed: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $2: datetime.datetime(2026, 4, 1, 13, 29, 56... (can't subtract offset-naive and offset-aware datetimes) [SQL: UPDATE"
+                    - generic [ref=e156]: $0.00 / $2.00
+                - generic [ref=e158] [cursor=pointer]:
+                  - generic [ref=e159]:
+                    - generic [ref=e160]: 취소됨
+                    - generic [ref=e161]: 약 10시간 전
+                  - generic [ref=e165]:
+                    - generic [ref=e166]: evidence_pack completed
+                    - generic [ref=e167]: $0.00 / $2.00
+                - generic [ref=e169] [cursor=pointer]:
+                  - generic [ref=e170]:
+                    - generic [ref=e171]: 실패
+                    - generic [ref=e172]: 약 10시간 전
+                  - generic [ref=e176]:
+                    - generic [ref=e177]: "research failed: 'GenerateContentResponse' object has no attribute 'input_tokens'"
+                    - generic [ref=e178]: $0.00 / $2.00
+                - generic [ref=e180] [cursor=pointer]:
+                  - generic [ref=e181]:
+                    - generic [ref=e182]: 실패
+                    - generic [ref=e183]: 약 10시간 전
+                  - generic [ref=e187]:
+                    - generic [ref=e188]: "research failed: Unterminated string starting at: line 523 column 20 (char 19792)"
+                    - generic [ref=e189]: $0.00 / $2.00
+                - generic [ref=e191] [cursor=pointer]:
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: 실패
+                    - generic [ref=e194]: 약 10시간 전
+                  - generic [ref=e198]:
+                    - generic [ref=e199]: "research failed: Expecting ',' delimiter: line 525 column 25 (char 18531)"
+                    - generic [ref=e200]: $0.00 / $2.00
+                - generic [ref=e202] [cursor=pointer]:
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: 실패
+                    - generic [ref=e205]: 약 10시간 전
+                  - generic [ref=e209]:
+                    - generic [ref=e210]: "research failed: Expecting property name enclosed in double quotes: line 447 column 26 (char 16825)"
+                    - generic [ref=e211]: $0.00 / $2.00
+                - generic [ref=e213] [cursor=pointer]:
+                  - generic [ref=e214]:
+                    - generic [ref=e215]: 실패
+                    - generic [ref=e216]: 약 10시간 전
+                  - generic [ref=e220]:
+                    - generic [ref=e221]: "research failed: Expecting property name enclosed in double quotes: line 463 column 47 (char 15254)"
+                    - generic [ref=e222]: $0.00 / $2.00
+                - generic [ref=e224] [cursor=pointer]:
+                  - generic [ref=e225]:
+                    - generic [ref=e226]: 대기 중
+                    - generic [ref=e227]: 약 10시간 전
+                  - generic [ref=e231]:
+                    - generic [ref=e232]: extract completed
+                    - generic [ref=e233]: $0.00 / $2.00
+                - generic [ref=e235] [cursor=pointer]:
+                  - generic [ref=e238]: 약 11시간 전
+                  - generic [ref=e241]:
+                    - generic [ref=e242]: Retrying from extract
+                    - generic [ref=e243]: $0.00 / $2.00
+                - generic [ref=e245] [cursor=pointer]:
+                  - generic [ref=e246]:
+                    - generic [ref=e247]: 취소됨
+                    - generic [ref=e248]: 약 11시간 전
+                  - generic [ref=e251]:
+                    - generic [ref=e252]: 0%
+                    - generic [ref=e253]: $0.00 / $2.00
+                - generic [ref=e255] [cursor=pointer]:
+                  - generic [ref=e256]:
+                    - generic [ref=e257]: 대기 중
+                    - generic [ref=e258]: 약 11시간 전
+                  - generic [ref=e261]:
+                    - generic [ref=e262]: 0%
+                    - generic [ref=e263]: $0.00 / $2.00
+                - generic [ref=e265] [cursor=pointer]:
+                  - generic [ref=e266]:
+                    - generic [ref=e267]: 대기 중
+                    - generic [ref=e268]: 약 11시간 전
+                  - generic [ref=e271]:
+                    - generic [ref=e272]: 0%
+                    - generic [ref=e273]: $0.00 / $3.00
+                - generic [ref=e275] [cursor=pointer]:
+                  - generic [ref=e276]:
+                    - generic [ref=e277]: 대기 중
+                    - generic [ref=e278]: 약 11시간 전
+                  - generic [ref=e281]:
+                    - generic [ref=e282]: 0%
+                    - generic [ref=e283]: $0.00 / $2.00
+                - generic [ref=e285] [cursor=pointer]:
+                  - generic [ref=e286]:
+                    - generic [ref=e287]: 대기 중
+                    - generic [ref=e288]: 약 11시간 전
+                  - generic [ref=e291]:
+                    - generic [ref=e292]: 0%
+                    - generic [ref=e293]: $0.00 / $10.00
+                - generic [ref=e295] [cursor=pointer]:
+                  - generic [ref=e296]:
+                    - generic [ref=e297]: 대기 중
+                    - generic [ref=e298]: 약 11시간 전
+                  - generic [ref=e301]:
+                    - generic [ref=e302]: 0%
+                    - generic [ref=e303]: $0.00 / $0.50
+                - generic [ref=e305] [cursor=pointer]:
+                  - generic [ref=e306]:
+                    - generic [ref=e307]: 대기 중
+                    - generic [ref=e308]: 약 11시간 전
+                  - generic [ref=e311]:
+                    - generic [ref=e312]: 0%
+                    - generic [ref=e313]: $0.00 / $2.00
+                - generic [ref=e314]:
+                  - button "이전" [disabled]
+                  - generic [ref=e315]: 1 / 2
+                  - button "다음" [ref=e316] [cursor=pointer]
+  - region "Notifications alt+T"

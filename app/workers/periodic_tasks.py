@@ -55,7 +55,7 @@ def cleanup_stale_jobs_task() -> int:
 
 
 async def _cleanup_stale() -> int:
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     stale_cutoff = now - timedelta(hours=24)
     count = 0
 

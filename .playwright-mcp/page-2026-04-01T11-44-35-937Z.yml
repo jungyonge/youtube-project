@@ -1,0 +1,36 @@
+- generic [ref=e2]:
+  - generic [ref=e18]:
+    - complementary [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: AI Video Studio
+        - button [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+      - navigation [ref=e26]:
+        - link "대시보드" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e28]
+          - generic [ref=e33]: 대시보드
+        - link "내 영상" [ref=e34] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e35]
+          - generic [ref=e37]: 내 영상
+      - generic [ref=e38]:
+        - button "다크 모드" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+          - generic [ref=e42]: 다크 모드
+        - generic [ref=e43]: test@example.com
+        - button "로그아웃" [ref=e44] [cursor=pointer]:
+          - img [ref=e45]
+          - generic [ref=e48]: 로그아웃
+    - generic [ref=e49]:
+      - banner [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: 오늘 0/5
+          - generic [ref=e53]: test@example.com
+      - main [ref=e54]:
+        - generic [ref=e124]:
+          - heading "내 영상" [level=1] [ref=e125]
+          - generic [ref=e126]:
+            - img [ref=e127]
+            - paragraph [ref=e129]: 아직 생성된 영상이 없습니다.
+  - region "Notifications alt+T"

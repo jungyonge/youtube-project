@@ -1,0 +1,147 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - generic: AI Video Studio
+          - button:
+            - img
+        - navigation:
+          - link:
+            - /url: /dashboard
+            - img
+            - generic: 대시보드
+          - link:
+            - /url: /jobs
+            - img
+            - generic: 내 영상
+        - generic:
+          - button:
+            - img
+            - generic: 다크 모드
+          - generic: test@example.com
+          - button:
+            - img
+            - generic: 로그아웃
+      - generic:
+        - banner:
+          - generic:
+            - generic: 오늘 0/5
+            - generic: test@example.com
+        - main:
+          - generic:
+            - heading [level=1]: 대시보드
+            - generic:
+              - generic:
+                - generic:
+                  - generic: 영상 생성
+                - generic:
+                  - generic:
+                    - generic:
+                      - text: 주제
+                      - textbox:
+                        - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                    - generic:
+                      - text: 소스
+                      - generic:
+                        - generic:
+                          - generic:
+                            - combobox [expanded]:
+                              - generic: 블로그
+                              - img
+                            - combobox
+                          - generic:
+                            - generic:
+                              - textbox:
+                                - /placeholder: https://...
+                          - button [disabled]:
+                            - img
+                        - button:
+                          - img
+                          - text: 소스 추가
+                    - generic:
+                      - text: 스타일
+                      - generic:
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 정보 전달
+                            - generic: 객관적 사실 중심
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 스토리텔링
+                            - generic: 이야기 구조
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 튜토리얼
+                            - generic: 단계별 설명
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 오피니언
+                            - generic: 관점 제시
+                    - button:
+                      - text: 고급 설정
+                      - img
+                    - button: 영상 생성 시작
+              - generic:
+                - heading [level=2]: 내 영상
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $10.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $0.50
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+    - region "Notifications alt+T"
+  - listbox [ref=e181]:
+    - option "블로그" [active] [selected] [ref=e182]:
+      - img [ref=e185]
+      - generic [ref=e187]: 블로그
+    - option "뉴스" [ref=e188]:
+      - generic [ref=e190]: 뉴스
+    - option "유튜브" [ref=e191]:
+      - generic [ref=e193]: 유튜브
+    - option "직접 입력" [ref=e194]:
+      - generic [ref=e196]: 직접 입력

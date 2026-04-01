@@ -41,10 +41,11 @@ client.interceptors.response.use(
     const { status } = error.response;
 
     if (status === 401) {
-      // TODO: PRODUCTION_SECURITY — Refresh Token으로 Silent Refresh 시도
-      // 현재 MVP: 바로 로그아웃
-      useAuthStore.getState().logout();
-      window.location.href = "/login";
+      const url = error.config?.url || "";
+      if (!url.startsWith("/auth/")) {
+        useAuthStore.getState().logout();
+        window.location.href = "/login";
+      }
       return Promise.reject(error);
     }
 
@@ -144,7 +145,22 @@ export const api = {
 
   admin: {
     getStats: () =>
-      client.get<AdminStats>("/admin/stats").then((r) => r.data),
+      client.get("/admin/stats").then((r) => {
+        const d = r.data;
+        // Map nested BE response to flat FE AdminStats
+        if (d.jobs !== undefined) {
+          const created = d.jobs?.created ?? 0;
+          const completed = d.jobs?.completed ?? 0;
+          const failed = d.jobs?.failed ?? 0;
+          return {
+            today_jobs: created,
+            success_rate: created > 0 ? completed / created : 0,
+            daily_cost_usd: d.cost?.total_usd ?? 0,
+            active_jobs: d.jobs?.active ?? 0,
+          } as AdminStats;
+        }
+        return d as AdminStats;
+      }),
 
     getDailyStats: (days: number = 30) =>
       client

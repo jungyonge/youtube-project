@@ -1,0 +1,95 @@
+- generic [ref=e2]:
+  - generic [ref=e18]:
+    - complementary [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: AI Video Studio
+        - button [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+      - navigation [ref=e26]:
+        - link "대시보드" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e28]
+          - generic [ref=e33]: 대시보드
+        - link "내 영상" [ref=e34] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e35]
+          - generic [ref=e37]: 내 영상
+        - link "관리" [ref=e38] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e39]
+          - generic [ref=e41]: 관리
+      - generic [ref=e42]:
+        - button "다크 모드" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+          - generic [ref=e46]: 다크 모드
+        - generic [ref=e47]: admin@example.com
+        - button "로그아웃" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+          - generic [ref=e52]: 로그아웃
+    - generic [ref=e53]:
+      - banner [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]: 오늘 0/5
+          - generic [ref=e57]: admin@example.com
+      - main [ref=e58]:
+        - generic [ref=e59]:
+          - heading "대시보드" [level=1] [ref=e60]
+          - generic [ref=e62]:
+            - tablist [ref=e63]:
+              - tab "영상 생성" [selected] [ref=e64] [cursor=pointer]
+              - tab "내 영상" [ref=e65] [cursor=pointer]
+            - tabpanel "영상 생성" [ref=e66]:
+              - generic [ref=e67]:
+                - generic [ref=e69]: 영상 생성
+                - generic [ref=e71]:
+                  - generic [ref=e72]:
+                    - text: 주제
+                    - textbox "주제" [ref=e73]:
+                      - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                  - generic [ref=e74]:
+                    - text: 소스
+                    - generic [ref=e75]:
+                      - generic [ref=e76]:
+                        - generic [ref=e77]:
+                          - combobox [ref=e78] [cursor=pointer]:
+                            - generic: 블로그
+                            - img [ref=e79]
+                          - combobox [ref=e81]
+                        - textbox "https://..." [ref=e84]
+                        - button [disabled]:
+                          - img
+                      - button "소스 추가" [ref=e85] [cursor=pointer]:
+                        - img [ref=e86]
+                        - text: 소스 추가
+                  - generic [ref=e87]:
+                    - text: 스타일
+                    - generic [ref=e88]:
+                      - button "정보 전달 객관적 사실 중심" [ref=e89] [cursor=pointer]:
+                        - img [ref=e90]
+                        - generic [ref=e92]:
+                          - generic [ref=e93]: 정보 전달
+                          - generic [ref=e94]: 객관적 사실 중심
+                      - button "스토리텔링 이야기 구조" [ref=e95] [cursor=pointer]:
+                        - img [ref=e96]
+                        - generic [ref=e101]:
+                          - generic [ref=e102]: 스토리텔링
+                          - generic [ref=e103]: 이야기 구조
+                      - button "튜토리얼 단계별 설명" [ref=e104] [cursor=pointer]:
+                        - img [ref=e105]
+                        - generic [ref=e108]:
+                          - generic [ref=e109]: 튜토리얼
+                          - generic [ref=e110]: 단계별 설명
+                      - button "오피니언 관점 제시" [ref=e111] [cursor=pointer]:
+                        - img [ref=e112]
+                        - generic [ref=e114]:
+                          - generic [ref=e115]: 오피니언
+                          - generic [ref=e116]: 관점 제시
+                  - button "고급 설정" [ref=e117] [cursor=pointer]:
+                    - text: 고급 설정
+                    - img
+                  - button "영상 생성 시작" [ref=e119] [cursor=pointer]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e120]:
+        - img [ref=e122]
+        - generic [ref=e125]: 로그인 성공

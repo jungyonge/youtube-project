@@ -24,7 +24,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         # Only rate-limit API mutation endpoints
-        if not request.url.path.startswith("/api/"):
+        if not request.url.path.startswith("/api/") or request.method in ("GET", "OPTIONS"):
             return await call_next(request)
 
         # Identify client by Authorization header user or IP

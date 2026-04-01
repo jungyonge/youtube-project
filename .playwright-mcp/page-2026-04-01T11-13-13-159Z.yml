@@ -1,0 +1,36 @@
+- generic [ref=e2]:
+  - generic [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e21]: 회원가입
+      - generic [ref=e22]: 새 계정을 만들어 시작하세요
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - text: 이메일
+          - textbox "이메일" [ref=e26]:
+            - /placeholder: you@example.com
+            - text: admin@example.com
+        - generic [ref=e27]:
+          - text: 비밀번호
+          - textbox "비밀번호" [ref=e28]:
+            - /placeholder: ••••••••
+            - text: adminpassword123
+        - generic [ref=e29]:
+          - text: 비밀번호 확인
+          - textbox "비밀번호 확인" [ref=e30]:
+            - /placeholder: ••••••••
+            - text: adminpassword123
+      - generic [ref=e31]:
+        - button "회원가입" [ref=e32] [cursor=pointer]
+        - paragraph [ref=e33]:
+          - text: 이미 계정이 있으신가요?
+          - link "로그인" [ref=e34] [cursor=pointer]:
+            - /url: /login
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e47]:
+        - img [ref=e49]
+        - generic [ref=e52]: 회원가입에 실패했습니다. 이미 존재하는 이메일일 수 있습니다.
+      - listitem [ref=e53]:
+        - img [ref=e55]
+        - generic [ref=e58]: 네트워크 오류가 발생했습니다.

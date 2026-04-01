@@ -1,0 +1,92 @@
+- generic [ref=e2]:
+  - generic [ref=e20]:
+    - complementary [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: AI Video Studio
+        - button [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+      - navigation [ref=e28]:
+        - link "대시보드" [ref=e29] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e30]
+          - generic [ref=e35]: 대시보드
+        - link "내 영상" [ref=e36] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e37]
+          - generic [ref=e39]: 내 영상
+      - generic [ref=e40]:
+        - button "다크 모드" [ref=e41] [cursor=pointer]:
+          - img [ref=e42]
+          - generic [ref=e44]: 다크 모드
+        - generic [ref=e45]: newuser-tc05b@example.com
+        - button "로그아웃" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+          - generic [ref=e50]: 로그아웃
+    - generic [ref=e51]:
+      - banner [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]: 오늘 0/5
+          - generic [ref=e55]: newuser-tc05b@example.com
+      - main [ref=e56]:
+        - generic [ref=e57]:
+          - heading "대시보드" [level=1] [ref=e58]
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e62]: 영상 생성
+              - generic [ref=e64]:
+                - generic [ref=e65]:
+                  - text: 주제
+                  - textbox "주제" [ref=e66]:
+                    - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                - generic [ref=e67]:
+                  - text: 소스
+                  - generic [ref=e68]:
+                    - generic [ref=e69]:
+                      - generic [ref=e70]:
+                        - combobox [ref=e71] [cursor=pointer]:
+                          - generic: 블로그
+                          - img [ref=e72]
+                        - combobox [ref=e74]
+                      - textbox "https://..." [ref=e77]
+                      - button [disabled]:
+                        - img
+                    - button "소스 추가" [ref=e78] [cursor=pointer]:
+                      - img [ref=e79]
+                      - text: 소스 추가
+                - generic [ref=e80]:
+                  - text: 스타일
+                  - generic [ref=e81]:
+                    - button "정보 전달 객관적 사실 중심" [ref=e82] [cursor=pointer]:
+                      - img [ref=e83]
+                      - generic [ref=e85]:
+                        - generic [ref=e86]: 정보 전달
+                        - generic [ref=e87]: 객관적 사실 중심
+                    - button "스토리텔링 이야기 구조" [ref=e88] [cursor=pointer]:
+                      - img [ref=e89]
+                      - generic [ref=e94]:
+                        - generic [ref=e95]: 스토리텔링
+                        - generic [ref=e96]: 이야기 구조
+                    - button "튜토리얼 단계별 설명" [ref=e97] [cursor=pointer]:
+                      - img [ref=e98]
+                      - generic [ref=e101]:
+                        - generic [ref=e102]: 튜토리얼
+                        - generic [ref=e103]: 단계별 설명
+                    - button "오피니언 관점 제시" [ref=e104] [cursor=pointer]:
+                      - img [ref=e105]
+                      - generic [ref=e107]:
+                        - generic [ref=e108]: 오피니언
+                        - generic [ref=e109]: 관점 제시
+                - button "고급 설정" [ref=e110] [cursor=pointer]:
+                  - text: 고급 설정
+                  - img [ref=e111]
+                - button "영상 생성 시작" [ref=e113] [cursor=pointer]
+            - generic [ref=e114]:
+              - heading "내 영상" [level=2] [ref=e115]
+              - generic [ref=e116]:
+                - img [ref=e117]
+                - paragraph [ref=e119]: 아직 생성된 영상이 없습니다.
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e120]:
+        - img [ref=e122]
+        - generic [ref=e125]: 회원가입 완료

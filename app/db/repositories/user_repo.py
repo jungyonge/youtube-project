@@ -35,7 +35,7 @@ class UserRepository:
     async def get_daily_job_count(self, user_id: uuid.UUID, target_date: date | None = None) -> int:
         if target_date is None:
             target_date = datetime.now(timezone.utc).date()
-        start = datetime(target_date.year, target_date.month, target_date.day, tzinfo=timezone.utc)
+        start = datetime(target_date.year, target_date.month, target_date.day)
         end = start + __import__("datetime").timedelta(days=1)
         result = await self._db.execute(
             select(func.count(VideoJob.id)).where(

@@ -18,6 +18,11 @@ export default function ApprovalPage() {
     enabled: !!jobId,
   });
 
+  // If not awaiting approval, redirect to detail page (check before script load)
+  if (job && job.phase !== "awaiting_approval") {
+    return <Navigate to={`/jobs/${job.job_id}`} replace />;
+  }
+
   if (jobLoading || scriptLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -32,11 +37,6 @@ export default function ApprovalPage() {
         데이터를 불러올 수 없습니다.
       </div>
     );
-  }
-
-  // If not awaiting approval, redirect to detail page
-  if (job.phase !== "awaiting_approval") {
-    return <Navigate to={`/jobs/${job.job_id}`} replace />;
   }
 
   return (

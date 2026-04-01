@@ -1,0 +1,167 @@
+- generic [ref=e2]:
+  - generic [ref=e6]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: AI Video Studio
+        - button [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+      - navigation [ref=e14]:
+        - link "대시보드" [ref=e15] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e16]
+          - generic [ref=e21]: 대시보드
+        - link "내 영상" [ref=e22] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e23]
+          - generic [ref=e25]: 내 영상
+      - generic [ref=e26]:
+        - button "다크 모드" [ref=e27] [cursor=pointer]:
+          - img [ref=e28]
+          - generic [ref=e30]: 다크 모드
+        - generic [ref=e31]: test@example.com
+        - button "로그아웃" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+          - generic [ref=e36]: 로그아웃
+    - generic [ref=e37]:
+      - banner [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]: 오늘 0/5
+          - generic [ref=e41]: test@example.com
+      - main [ref=e42]:
+        - generic [ref=e43]:
+          - heading "대시보드" [level=1] [ref=e44]
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - generic [ref=e48]: 영상 생성
+              - generic [ref=e50]:
+                - generic [ref=e51]:
+                  - text: 주제
+                  - textbox "주제" [ref=e52]:
+                    - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                    - text: React와 TypeScript를 활용한 웹 개발 튜토리얼
+                - generic [ref=e53]:
+                  - text: 소스
+                  - generic [ref=e54]:
+                    - generic [ref=e55]:
+                      - generic [ref=e56]:
+                        - combobox [ref=e57] [cursor=pointer]:
+                          - generic: 블로그
+                          - img [ref=e58]
+                        - combobox [ref=e60]
+                      - textbox "https://..." [ref=e63]: https://example.com/react-tutorial
+                      - button [disabled]:
+                        - img
+                    - button "소스 추가" [ref=e64] [cursor=pointer]:
+                      - img [ref=e65]
+                      - text: 소스 추가
+                - generic [ref=e66]:
+                  - text: 스타일
+                  - generic [ref=e67]:
+                    - button "정보 전달 객관적 사실 중심" [ref=e68] [cursor=pointer]:
+                      - img [ref=e69]
+                      - generic [ref=e71]:
+                        - generic [ref=e72]: 정보 전달
+                        - generic [ref=e73]: 객관적 사실 중심
+                    - button "스토리텔링 이야기 구조" [ref=e74] [cursor=pointer]:
+                      - img [ref=e75]
+                      - generic [ref=e80]:
+                        - generic [ref=e81]: 스토리텔링
+                        - generic [ref=e82]: 이야기 구조
+                    - button "튜토리얼 단계별 설명" [ref=e83] [cursor=pointer]:
+                      - img [ref=e84]
+                      - generic [ref=e87]:
+                        - generic [ref=e88]: 튜토리얼
+                        - generic [ref=e89]: 단계별 설명
+                    - button "오피니언 관점 제시" [ref=e90] [cursor=pointer]:
+                      - img [ref=e91]
+                      - generic [ref=e93]:
+                        - generic [ref=e94]: 오피니언
+                        - generic [ref=e95]: 관점 제시
+                - button "고급 설정" [ref=e96] [cursor=pointer]:
+                  - text: 고급 설정
+                  - img [ref=e153]
+                - generic [ref=e155]:
+                  - generic [ref=e156]:
+                    - generic [ref=e157]: "영상 길이: 10분"
+                    - slider [ref=e161]
+                  - generic [ref=e162]:
+                    - text: 음성
+                    - combobox "음성" [ref=e163] [cursor=pointer]:
+                      - generic: Nova (여성)
+                      - img [ref=e164]
+                    - combobox [ref=e166]
+                  - generic [ref=e167]:
+                    - text: 언어
+                    - combobox "언어" [ref=e168] [cursor=pointer]:
+                      - generic: 한국어
+                      - img [ref=e169]
+                    - combobox [ref=e171]
+                  - generic [ref=e172]:
+                    - generic [ref=e173]: 자막 포함
+                    - switch "자막 포함" [checked] [ref=e174] [cursor=pointer]
+                    - checkbox [checked]
+                  - generic [ref=e175]:
+                    - generic [ref=e176]: 배경 음악
+                    - switch "배경 음악" [ref=e177] [cursor=pointer]
+                    - checkbox
+                  - generic [ref=e178]:
+                    - text: 비용 예산 ($)
+                    - spinbutton "비용 예산 ($)" [ref=e179]: "3"
+                  - generic [ref=e180]:
+                    - generic [ref=e181]:
+                      - generic [ref=e182]: 자동 승인
+                      - switch "자동 승인" [ref=e183] [cursor=pointer]
+                      - checkbox
+                    - paragraph [ref=e186]: 대본 생성 후 직접 검토하고 승인해야 영상 생성이 진행됩니다.
+                  - generic [ref=e184]:
+                    - text: 추가 지시사항
+                    - textbox "추가 지시사항" [ref=e185]:
+                      - /placeholder: 특별한 요구사항이 있다면 입력하세요...
+                      - text: 초보자도 이해할 수 있는 쉬운 언어로 설명해주세요
+                - button "영상 생성 시작" [ref=e99] [cursor=pointer]
+            - generic [ref=e100]:
+              - heading "내 영상" [level=2] [ref=e101]
+              - generic [ref=e102]:
+                - generic [ref=e104] [cursor=pointer]:
+                  - generic [ref=e105]:
+                    - generic [ref=e106]: 대기 중
+                    - generic [ref=e107]: 약 9시간 전
+                  - generic [ref=e110]:
+                    - generic [ref=e111]: 0%
+                    - generic [ref=e112]: $0.00 / $2.00
+                - generic [ref=e114] [cursor=pointer]:
+                  - generic [ref=e115]:
+                    - generic [ref=e116]: 대기 중
+                    - generic [ref=e117]: 약 9시간 전
+                  - generic [ref=e120]:
+                    - generic [ref=e121]: 0%
+                    - generic [ref=e122]: $0.00 / $10.00
+                - generic [ref=e124] [cursor=pointer]:
+                  - generic [ref=e125]:
+                    - generic [ref=e126]: 대기 중
+                    - generic [ref=e127]: 약 9시간 전
+                  - generic [ref=e130]:
+                    - generic [ref=e131]: 0%
+                    - generic [ref=e132]: $0.00 / $0.50
+                - generic [ref=e134] [cursor=pointer]:
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: 대기 중
+                    - generic [ref=e137]: 약 9시간 전
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: 0%
+                    - generic [ref=e142]: $0.00 / $2.00
+                - generic [ref=e144] [cursor=pointer]:
+                  - generic [ref=e145]:
+                    - generic [ref=e146]: 대기 중
+                    - generic [ref=e147]: 약 9시간 전
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: 0%
+                    - generic [ref=e152]: $0.00 / $2.00
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e211]:
+        - img [ref=e213]
+        - generic [ref=e216]: 영상 생성에 실패했습니다.
+      - listitem [ref=e217]:
+        - img [ref=e219]
+        - generic [ref=e222]: 요청 제한을 초과했습니다. 잠시 후 다시 시도해주세요.

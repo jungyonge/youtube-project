@@ -5,16 +5,16 @@ from pydantic import BaseModel, Field
 
 
 class SourceInput(BaseModel):
-    url: str = Field(..., min_length=1)
+    url: str | None = None
     source_type: Literal["blog", "news", "youtube", "custom_text"] = "blog"
     custom_text: str | None = None
 
 
 class VideoStyle(str, Enum):
     INFORMATIVE = "informative"
-    ENTERTAINING = "entertaining"
-    EDUCATIONAL = "educational"
-    NEWS = "news"
+    STORYTELLING = "storytelling"
+    TUTORIAL = "tutorial"
+    OPINION = "opinion"
 
 
 class VideoGenerationRequest(BaseModel):

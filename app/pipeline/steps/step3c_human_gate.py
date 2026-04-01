@@ -80,7 +80,7 @@ def human_gate_task(self, job_id: str) -> str:
                     requires_human_approval=True,
                     current_step_detail="대본 승인 대기 중",
                     progress_percent=55,
-                    updated_at=datetime.now(timezone.utc),
+                    updated_at=datetime.utcnow(),
                 )
             )
             db.commit()

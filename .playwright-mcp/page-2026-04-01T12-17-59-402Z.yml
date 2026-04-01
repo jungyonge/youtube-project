@@ -1,0 +1,22 @@
+- generic [ref=e2]:
+  - generic [ref=e186]:
+    - generic [ref=e187]:
+      - generic [ref=e188]: 로그인
+      - generic [ref=e189]: AI Video Studio에 로그인하세요
+    - generic [ref=e190]:
+      - generic [ref=e191]:
+        - generic [ref=e192]:
+          - text: 이메일
+          - textbox "이메일" [ref=e193]:
+            - /placeholder: you@example.com
+        - generic [ref=e194]:
+          - text: 비밀번호
+          - textbox "비밀번호" [ref=e195]:
+            - /placeholder: ••••••••
+      - generic [ref=e196]:
+        - button "로그인" [ref=e197] [cursor=pointer]
+        - paragraph [ref=e198]:
+          - text: 계정이 없으신가요?
+          - link "회원가입" [ref=e199] [cursor=pointer]:
+            - /url: /register
+  - region "Notifications alt+T"

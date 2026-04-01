@@ -1,0 +1,1 @@
+- generic [ref=e2]: "{\"status\":\"healthy\",\"components\":{\"database\":{\"status\":\"healthy\"},\"redis\":{\"status\":\"healthy\"},\"minio\":{\"status\":\"healthy\"},\"api_keys\":{\"status\":\"healthy\"}}}"

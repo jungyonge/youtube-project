@@ -44,7 +44,24 @@ const sourceSchema = z.object({
   source_type: z.enum(["blog", "news", "youtube", "custom_text"]),
   url: z.string().optional(),
   custom_text: z.string().optional(),
-});
+}).refine(
+  (data) => {
+    if (data.source_type !== "custom_text") {
+      if (!data.url) return false;
+      try { new URL(data.url); return true; } catch { return false; }
+    }
+    return true;
+  },
+  { message: "올바른 URL을 입력하세요 (https://...)", path: ["url"] }
+).refine(
+  (data) => {
+    if (data.source_type === "custom_text") {
+      return !!data.custom_text?.trim();
+    }
+    return true;
+  },
+  { message: "텍스트를 입력하세요", path: ["custom_text"] }
+);
 
 const formSchema = z.object({
   topic: z.string().min(5, "주제는 5자 이상이어야 합니다").max(200, "주제는 200자 이하여야 합니다"),

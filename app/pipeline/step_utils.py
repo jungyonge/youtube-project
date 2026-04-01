@@ -28,7 +28,7 @@ def begin_step(job_id: str, step_name: str) -> uuid.UUID:
             job_id=uuid.UUID(job_id),
             step_name=step_name,
             status="running",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.utcnow(),
         )
         db.add(step)
         db.commit()
@@ -48,7 +48,7 @@ def complete_step(
     metadata: dict | None = None,
 ) -> None:
     """Step 완료 기록 + 진행률 업데이트."""
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     with SyncSessionLocal() as db:
         step_uuid = uuid.UUID(step_id) if isinstance(step_id, str) else step_id
         db.execute(
@@ -86,7 +86,7 @@ def fail_step(
     error: Exception,
 ) -> None:
     """Step 실패 기록."""
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     tb = traceback.format_exception(type(error), error, error.__traceback__)
     with SyncSessionLocal() as db:
         step_uuid = uuid.UUID(step_id) if isinstance(step_id, str) else step_id
@@ -105,7 +105,7 @@ def fail_step(
             .where(VideoJob.id == uuid.UUID(job_id))
             .values(
                 phase="failed",
-                current_step_detail=f"{step_name} failed: {error}",
+                current_step_detail=f"{step_name} failed: {error}"[:255],
                 updated_at=now,
             )
         )

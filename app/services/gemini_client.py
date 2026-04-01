@@ -85,29 +85,55 @@ class GeminiClient:
         system_instruction: str | None = None,
         temperature: float = 0.3,
     ) -> dict:
+        from google import genai
+
+        client = genai.Client(api_key=self._api_key)
+
         json_instruction = (
             (system_instruction or "")
-            + "\n\nIMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, no explanations."
-        )
-        response = await self.generate(
-            prompt=prompt,
-            system_instruction=json_instruction,
-            temperature=temperature,
+            + "\n\nIMPORTANT: Respond ONLY with valid JSON."
         )
 
-        # JSON 추출: 코드블록 제거
-        text = response.text.strip()
+        config = genai.types.GenerateContentConfig(
+            temperature=temperature,
+            max_output_tokens=settings.GEMINI_MAX_TOKENS,
+            response_mime_type="application/json",
+        )
+        if json_instruction:
+            config.system_instruction = json_instruction
+
+        response = client.models.generate_content(
+            model=self._model,
+            contents=prompt,
+            config=config,
+        )
+
+        text = response.text or ""
+        input_tokens = getattr(response.usage_metadata, "prompt_token_count", 0) or 0
+        output_tokens = getattr(response.usage_metadata, "candidates_token_count", 0) or 0
+        cost = _calc_cost(self._model, input_tokens, output_tokens)
+
+        logger.debug(
+            "Gemini JSON response: model={} in={} out={} cost=${:.4f}",
+            self._model, input_tokens, output_tokens, cost,
+        )
+
+        # JSON 추출: 코드블록 제거 (방어적)
+        text = text.strip()
         if text.startswith("```"):
             lines = text.split("\n")
             text = "\n".join(lines[1:-1]) if len(lines) > 2 else text
+
+        import re
+        text = re.sub(r",\s*([}\]])", r"\1", text)  # trailing comma
 
         parsed = json.loads(text)
 
         # response 메타를 dict에 첨부
         parsed["_meta"] = {
-            "input_tokens": response.input_tokens,
-            "output_tokens": response.output_tokens,
-            "model": response.model,
-            "cost_usd": response.cost_usd,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "model": self._model,
+            "cost_usd": cost,
         }
         return parsed

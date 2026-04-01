@@ -1,0 +1,67 @@
+- generic [ref=e2]:
+  - generic [ref=e18]:
+    - complementary [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: AI Video Studio
+        - button [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+      - navigation [ref=e26]:
+        - link "대시보드" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e28]
+          - generic [ref=e33]: 대시보드
+        - link "내 영상" [ref=e34] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e35]
+          - generic [ref=e37]: 내 영상
+        - link "관리" [ref=e38] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e39]
+          - generic [ref=e41]: 관리
+      - generic [ref=e42]:
+        - button "다크 모드" [ref=e43] [cursor=pointer]:
+          - img [ref=e44]
+          - generic [ref=e46]: 다크 모드
+        - generic [ref=e47]: admin@example.com
+        - button "로그아웃" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+          - generic [ref=e52]: 로그아웃
+    - generic [ref=e53]:
+      - banner [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]: 오늘 0/5
+          - generic [ref=e57]: admin@example.com
+      - main [ref=e58]:
+        - generic [ref=e128]:
+          - heading "관리자" [level=1] [ref=e129]
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - generic [ref=e133]: 오늘 생성
+                - img [ref=e134]
+              - generic [ref=e137]: 0건
+            - generic [ref=e138]:
+              - generic [ref=e139]:
+                - generic [ref=e140]: 성공률
+                - img [ref=e141]
+              - generic [ref=e145]: 0.0%
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - generic [ref=e148]: 일 비용
+                - img [ref=e149]
+              - generic [ref=e152]: $0.00
+            - generic [ref=e153]:
+              - generic [ref=e154]:
+                - generic [ref=e155]: 활성 작업
+                - img [ref=e156]
+              - generic [ref=e159]: 0건
+          - generic [ref=e160]:
+            - generic [ref=e161]:
+              - generic [ref=e162]: 전체 작업
+              - generic [ref=e163]:
+                - combobox [ref=e164] [cursor=pointer]:
+                  - generic: 전체
+                  - img [ref=e165]
+                - textbox "이메일 검색..." [ref=e167]
+            - paragraph [ref=e169]: 작업이 없습니다.
+  - region "Notifications alt+T"

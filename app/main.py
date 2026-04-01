@@ -43,6 +43,10 @@ app = FastAPI(
 )
 
 # Middleware (order matters: last added = first executed)
+# CORS must be outermost (added last) to handle preflight OPTIONS
+app.add_middleware(TraceMiddleware)
+app.add_middleware(IdempotencyMiddleware)
+app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -54,9 +58,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(TraceMiddleware)
-app.add_middleware(RateLimitMiddleware)
-app.add_middleware(IdempotencyMiddleware)
 
 # Routes
 app.include_router(health.router)

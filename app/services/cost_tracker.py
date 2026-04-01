@@ -57,7 +57,7 @@ class CostTracker:
                 .where(VideoJob.id == uuid.UUID(job_id))
                 .values(
                     total_cost_usd=VideoJob.total_cost_usd + cost_usd,
-                    updated_at=datetime.now(timezone.utc),
+                    updated_at=datetime.utcnow(),
                 )
             )
             await db.commit()

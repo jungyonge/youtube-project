@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -64,7 +64,7 @@ class JobRepository:
         return result.scalar_one_or_none()
 
     async def update_phase(self, job_id: uuid.UUID, phase: str, **kwargs) -> None:
-        values = {"phase": phase, "updated_at": datetime.now(timezone.utc), **kwargs}
+        values = {"phase": phase, "updated_at": datetime.utcnow(), **kwargs}
         await self._db.execute(
             update(VideoJob).where(VideoJob.id == job_id).values(**values)
         )

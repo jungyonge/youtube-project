@@ -1,0 +1,93 @@
+- generic [ref=e2]:
+  - generic [ref=e6]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: AI Video Studio
+        - button [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+      - navigation [ref=e14]:
+        - link "대시보드" [ref=e15] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e16]
+          - generic [ref=e21]: 대시보드
+        - link "내 영상" [ref=e22] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e23]
+          - generic [ref=e25]: 내 영상
+        - link "관리" [ref=e26] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e27]
+          - generic [ref=e29]: 관리
+      - generic [ref=e30]:
+        - button "다크 모드" [ref=e31] [cursor=pointer]:
+          - img [ref=e32]
+          - generic [ref=e34]: 다크 모드
+        - generic [ref=e35]: test@example.com
+        - button "로그아웃" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+          - generic [ref=e40]: 로그아웃
+    - generic [ref=e41]:
+      - banner [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: 오늘 21/50
+          - generic [ref=e45]: test@example.com
+      - main [ref=e46]:
+        - generic [ref=e321]:
+          - link "대시보드" [ref=e322] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e323]
+            - text: 대시보드
+          - generic [ref=e325]:
+            - generic [ref=e326]:
+              - generic [ref=e327]: 대기 중
+              - generic [ref=e328]: 2026-04-01 14:16
+            - button "취소" [ref=e330] [cursor=pointer]:
+              - img [ref=e331]
+              - text: 취소
+          - generic [ref=e334]:
+            - generic [ref=e335]:
+              - generic [ref=e338]: 추출
+              - generic [ref=e341]: 정규화
+              - generic [ref=e344]: 근거
+              - generic [ref=e347]: 대본
+              - generic [ref=e350]: 검수
+              - generic [ref=e353]: 정책
+              - generic [ref=e356]: 승인
+              - generic [ref=e359]: 에셋
+              - generic [ref=e362]: 조립
+            - generic [ref=e365]:
+              - generic [ref=e366]: 대기 중
+              - generic [ref=e367]:
+                - generic [ref=e368]: $0.00 / $2.00
+                - generic [ref=e369]:
+                  - img [ref=e370]
+                  - text: 실시간
+          - generic [ref=e374]:
+            - tablist [ref=e375]:
+              - tab "진행 상세" [selected] [ref=e376] [cursor=pointer]
+              - tab "대본" [ref=e377] [cursor=pointer]
+              - tab "결과" [ref=e378] [cursor=pointer]
+            - tabpanel "진행 상세" [ref=e379]:
+              - table [ref=e381]:
+                - rowgroup [ref=e382]:
+                  - row "단계 상태 소요 시간 비용 오류" [ref=e383]:
+                    - columnheader [ref=e384]
+                    - columnheader "단계" [ref=e385]
+                    - columnheader "상태" [ref=e386]
+                    - columnheader "소요 시간" [ref=e387]
+                    - columnheader "비용" [ref=e388]
+                    - columnheader "오류" [ref=e389]
+                - rowgroup [ref=e390]:
+                  - row "extract running - $0.00 -" [ref=e391]:
+                    - cell [ref=e392]:
+                      - img [ref=e393]
+                    - cell "extract" [ref=e395]
+                    - cell "running" [ref=e396]
+                    - cell "-" [ref=e397]
+                    - cell "$0.00" [ref=e398]
+                    - cell "-" [ref=e399]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e400]:
+        - img [ref=e402]
+        - generic [ref=e405]: 영상 생성이 시작되었습니다.

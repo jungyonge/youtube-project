@@ -14,8 +14,8 @@ from app.db.session import get_db
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) -> UserResponse:
+@router.post("/register", response_model=AuthTokenResponse, status_code=status.HTTP_201_CREATED)
+async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) -> AuthTokenResponse:
     repo = UserRepository(db)
 
     existing = await repo.get_by_email(body.email)
@@ -29,11 +29,18 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) ->
     user = await repo.create(email=body.email, hashed_password=hashed)
     logger.info("User registered: {}", user.email)
 
-    return UserResponse(
-        id=str(user.id),
-        email=user.email,
-        role=user.role,
-        created_at=user.created_at,
+    token = create_access_token({"sub": str(user.id), "email": user.email, "role": user.role})
+
+    return AuthTokenResponse(
+        access_token=token,
+        user=UserResponse(
+            id=str(user.id),
+            email=user.email,
+            role=user.role,
+            daily_quota=user.daily_quota,
+            today_usage=0,
+            created_at=user.created_at,
+        ),
     )
 
 

@@ -1,0 +1,276 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: AI Video Studio
+        - button [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+      - navigation [ref=e11]:
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e13]
+          - generic [ref=e18]: 대시보드
+        - link "내 영상" [ref=e19] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e20]
+          - generic [ref=e22]: 내 영상
+        - link "관리" [ref=e23] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e24]
+          - generic [ref=e26]: 관리
+      - generic [ref=e27]:
+        - button "다크 모드" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+          - generic [ref=e31]: 다크 모드
+        - generic [ref=e32]: admin@example.com
+        - button "로그아웃" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e37]: 로그아웃
+    - generic [ref=e38]:
+      - banner [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: 오늘 0/5
+          - generic [ref=e42]: admin@example.com
+      - main [ref=e43]:
+        - generic [ref=e107]:
+          - heading "관리자" [level=1] [ref=e108]
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - generic [ref=e111]:
+                - generic [ref=e112]: 오늘 생성
+                - img [ref=e113]
+              - generic [ref=e116]: 50건
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - generic [ref=e119]: 성공률
+                - img [ref=e120]
+              - generic [ref=e124]: 0.0%
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - generic [ref=e127]: 일 비용
+                - img [ref=e128]
+              - generic [ref=e131]: $0.01
+            - generic [ref=e132]:
+              - generic [ref=e133]:
+                - generic [ref=e134]: 활성 작업
+                - img [ref=e135]
+              - generic [ref=e138]: 9건
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]: 전체 작업
+              - generic [ref=e142]:
+                - combobox [ref=e143] [cursor=pointer]:
+                  - generic: 전체
+                  - img [ref=e144]
+                - textbox "이메일 검색..." [ref=e146]
+            - table [ref=e149]:
+              - rowgroup [ref=e150]:
+                - row "사용자 주제 상태 비용 생성일" [ref=e151]:
+                  - columnheader "사용자" [ref=e152]
+                  - columnheader "주제" [ref=e153]
+                  - columnheader "상태" [ref=e154]
+                  - columnheader "비용" [ref=e155]
+                  - columnheader "생성일" [ref=e156]
+                  - columnheader [ref=e157]
+              - rowgroup [ref=e158]:
+                - row "rate limit test 23 취소됨 $0.00 2026-04-01 14:19" [ref=e159]:
+                  - cell [ref=e160]
+                  - cell "rate limit test 23" [ref=e161]
+                  - cell "취소됨" [ref=e162]:
+                    - generic [ref=e163]: 취소됨
+                  - cell "$0.00" [ref=e164]
+                  - cell "2026-04-01 14:19" [ref=e165]
+                  - cell [ref=e166]:
+                    - button [ref=e168] [cursor=pointer]:
+                      - img [ref=e169]
+                - row "rate limit test 22 실패 $0.00 2026-04-01 14:19" [ref=e172]:
+                  - cell [ref=e173]
+                  - cell "rate limit test 22" [ref=e174]
+                  - cell "실패" [ref=e175]:
+                    - generic [ref=e176]: 실패
+                  - cell "$0.00" [ref=e177]
+                  - cell "2026-04-01 14:19" [ref=e178]
+                  - cell [ref=e179]:
+                    - button [ref=e181] [cursor=pointer]:
+                      - img [ref=e182]
+                - row "rate limit test 21 실패 $0.00 2026-04-01 14:19" [ref=e185]:
+                  - cell [ref=e186]
+                  - cell "rate limit test 21" [ref=e187]
+                  - cell "실패" [ref=e188]:
+                    - generic [ref=e189]: 실패
+                  - cell "$0.00" [ref=e190]
+                  - cell "2026-04-01 14:19" [ref=e191]
+                  - cell [ref=e192]:
+                    - button [ref=e194] [cursor=pointer]:
+                      - img [ref=e195]
+                - row "rate limit test 20 실패 $0.00 2026-04-01 14:19" [ref=e198]:
+                  - cell [ref=e199]
+                  - cell "rate limit test 20" [ref=e200]
+                  - cell "실패" [ref=e201]:
+                    - generic [ref=e202]: 실패
+                  - cell "$0.00" [ref=e203]
+                  - cell "2026-04-01 14:19" [ref=e204]
+                  - cell [ref=e205]:
+                    - button [ref=e207] [cursor=pointer]:
+                      - img [ref=e208]
+                - row "rate limit test 19 실패 $0.00 2026-04-01 14:19" [ref=e211]:
+                  - cell [ref=e212]
+                  - cell "rate limit test 19" [ref=e213]
+                  - cell "실패" [ref=e214]:
+                    - generic [ref=e215]: 실패
+                  - cell "$0.00" [ref=e216]
+                  - cell "2026-04-01 14:19" [ref=e217]
+                  - cell [ref=e218]:
+                    - button [ref=e220] [cursor=pointer]:
+                      - img [ref=e221]
+                - row "rate limit test 18 실패 $0.00 2026-04-01 14:19" [ref=e224]:
+                  - cell [ref=e225]
+                  - cell "rate limit test 18" [ref=e226]
+                  - cell "실패" [ref=e227]:
+                    - generic [ref=e228]: 실패
+                  - cell "$0.00" [ref=e229]
+                  - cell "2026-04-01 14:19" [ref=e230]
+                  - cell [ref=e231]:
+                    - button [ref=e233] [cursor=pointer]:
+                      - img [ref=e234]
+                - row "rate limit test 17 실패 $0.00 2026-04-01 14:19" [ref=e237]:
+                  - cell [ref=e238]
+                  - cell "rate limit test 17" [ref=e239]
+                  - cell "실패" [ref=e240]:
+                    - generic [ref=e241]: 실패
+                  - cell "$0.00" [ref=e242]
+                  - cell "2026-04-01 14:19" [ref=e243]
+                  - cell [ref=e244]:
+                    - button [ref=e246] [cursor=pointer]:
+                      - img [ref=e247]
+                - row "rate limit test 16 실패 $0.00 2026-04-01 14:19" [ref=e250]:
+                  - cell [ref=e251]
+                  - cell "rate limit test 16" [ref=e252]
+                  - cell "실패" [ref=e253]:
+                    - generic [ref=e254]: 실패
+                  - cell "$0.00" [ref=e255]
+                  - cell "2026-04-01 14:19" [ref=e256]
+                  - cell [ref=e257]:
+                    - button [ref=e259] [cursor=pointer]:
+                      - img [ref=e260]
+                - row "rate limit test 15 실패 $0.00 2026-04-01 14:19" [ref=e263]:
+                  - cell [ref=e264]
+                  - cell "rate limit test 15" [ref=e265]
+                  - cell "실패" [ref=e266]:
+                    - generic [ref=e267]: 실패
+                  - cell "$0.00" [ref=e268]
+                  - cell "2026-04-01 14:19" [ref=e269]
+                  - cell [ref=e270]:
+                    - button [ref=e272] [cursor=pointer]:
+                      - img [ref=e273]
+                - row "rate limit test 14 실패 $0.00 2026-04-01 14:19" [ref=e276]:
+                  - cell [ref=e277]
+                  - cell "rate limit test 14" [ref=e278]
+                  - cell "실패" [ref=e279]:
+                    - generic [ref=e280]: 실패
+                  - cell "$0.00" [ref=e281]
+                  - cell "2026-04-01 14:19" [ref=e282]
+                  - cell [ref=e283]:
+                    - button [ref=e285] [cursor=pointer]:
+                      - img [ref=e286]
+                - row "rate limit test 13 실패 $0.00 2026-04-01 14:19" [ref=e289]:
+                  - cell [ref=e290]
+                  - cell "rate limit test 13" [ref=e291]
+                  - cell "실패" [ref=e292]:
+                    - generic [ref=e293]: 실패
+                  - cell "$0.00" [ref=e294]
+                  - cell "2026-04-01 14:19" [ref=e295]
+                  - cell [ref=e296]:
+                    - button [ref=e298] [cursor=pointer]:
+                      - img [ref=e299]
+                - row "rate limit test 12 실패 $0.00 2026-04-01 14:19" [ref=e302]:
+                  - cell [ref=e303]
+                  - cell "rate limit test 12" [ref=e304]
+                  - cell "실패" [ref=e305]:
+                    - generic [ref=e306]: 실패
+                  - cell "$0.00" [ref=e307]
+                  - cell "2026-04-01 14:19" [ref=e308]
+                  - cell [ref=e309]:
+                    - button [ref=e311] [cursor=pointer]:
+                      - img [ref=e312]
+                - row "rate limit test 11 실패 $0.00 2026-04-01 14:19" [ref=e315]:
+                  - cell [ref=e316]
+                  - cell "rate limit test 11" [ref=e317]
+                  - cell "실패" [ref=e318]:
+                    - generic [ref=e319]: 실패
+                  - cell "$0.00" [ref=e320]
+                  - cell "2026-04-01 14:19" [ref=e321]
+                  - cell [ref=e322]:
+                    - button [ref=e324] [cursor=pointer]:
+                      - img [ref=e325]
+                - row "rate limit test 10 실패 $0.00 2026-04-01 14:19" [ref=e328]:
+                  - cell [ref=e329]
+                  - cell "rate limit test 10" [ref=e330]
+                  - cell "실패" [ref=e331]:
+                    - generic [ref=e332]: 실패
+                  - cell "$0.00" [ref=e333]
+                  - cell "2026-04-01 14:19" [ref=e334]
+                  - cell [ref=e335]:
+                    - button [ref=e337] [cursor=pointer]:
+                      - img [ref=e338]
+                - row "rate limit test 9 실패 $0.00 2026-04-01 14:19" [ref=e341]:
+                  - cell [ref=e342]
+                  - cell "rate limit test 9" [ref=e343]
+                  - cell "실패" [ref=e344]:
+                    - generic [ref=e345]: 실패
+                  - cell "$0.00" [ref=e346]
+                  - cell "2026-04-01 14:19" [ref=e347]
+                  - cell [ref=e348]:
+                    - button [ref=e350] [cursor=pointer]:
+                      - img [ref=e351]
+                - row "rate limit test 8 실패 $0.00 2026-04-01 14:19" [ref=e354]:
+                  - cell [ref=e355]
+                  - cell "rate limit test 8" [ref=e356]
+                  - cell "실패" [ref=e357]:
+                    - generic [ref=e358]: 실패
+                  - cell "$0.00" [ref=e359]
+                  - cell "2026-04-01 14:19" [ref=e360]
+                  - cell [ref=e361]:
+                    - button [ref=e363] [cursor=pointer]:
+                      - img [ref=e364]
+                - row "rate limit test 7 실패 $0.00 2026-04-01 14:19" [ref=e367]:
+                  - cell [ref=e368]
+                  - cell "rate limit test 7" [ref=e369]
+                  - cell "실패" [ref=e370]:
+                    - generic [ref=e371]: 실패
+                  - cell "$0.00" [ref=e372]
+                  - cell "2026-04-01 14:19" [ref=e373]
+                  - cell [ref=e374]:
+                    - button [ref=e376] [cursor=pointer]:
+                      - img [ref=e377]
+                - row "rate limit test 6 실패 $0.00 2026-04-01 14:19" [ref=e380]:
+                  - cell [ref=e381]
+                  - cell "rate limit test 6" [ref=e382]
+                  - cell "실패" [ref=e383]:
+                    - generic [ref=e384]: 실패
+                  - cell "$0.00" [ref=e385]
+                  - cell "2026-04-01 14:19" [ref=e386]
+                  - cell [ref=e387]:
+                    - button [ref=e389] [cursor=pointer]:
+                      - img [ref=e390]
+                - row "rate limit test 5 실패 $0.00 2026-04-01 14:19" [ref=e393]:
+                  - cell [ref=e394]
+                  - cell "rate limit test 5" [ref=e395]
+                  - cell "실패" [ref=e396]:
+                    - generic [ref=e397]: 실패
+                  - cell "$0.00" [ref=e398]
+                  - cell "2026-04-01 14:19" [ref=e399]
+                  - cell [ref=e400]:
+                    - button [ref=e402] [cursor=pointer]:
+                      - img [ref=e403]
+                - row "rate limit test 4 실패 $0.00 2026-04-01 14:19" [ref=e406]:
+                  - cell [ref=e407]
+                  - cell "rate limit test 4" [ref=e408]
+                  - cell "실패" [ref=e409]:
+                    - generic [ref=e410]: 실패
+                  - cell "$0.00" [ref=e411]
+                  - cell "2026-04-01 14:19" [ref=e412]
+                  - cell [ref=e413]:
+                    - button [ref=e415] [cursor=pointer]:
+                      - img [ref=e416]
+  - region "Notifications alt+T"

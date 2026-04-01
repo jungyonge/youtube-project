@@ -1,0 +1,80 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - button [active] [ref=e7] [cursor=pointer]:
+        - img [ref=e101]
+      - navigation [ref=e11]:
+        - link [ref=e103] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e13]
+        - link [ref=e104] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e20]
+      - generic [ref=e23]:
+        - button [ref=e105] [cursor=pointer]:
+          - img [ref=e25]
+        - button [ref=e106] [cursor=pointer]:
+          - img [ref=e30]
+    - generic [ref=e34]:
+      - banner [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: 오늘 50/50
+          - generic [ref=e38]: test@example.com
+      - main [ref=e39]:
+        - generic [ref=e40]:
+          - heading "대시보드" [level=1] [ref=e41]
+          - generic [ref=e43]:
+            - tablist [ref=e44]:
+              - tab "영상 생성" [selected] [ref=e45] [cursor=pointer]
+              - tab "내 영상" [ref=e46] [cursor=pointer]
+            - tabpanel "영상 생성" [ref=e47]:
+              - generic [ref=e48]:
+                - generic [ref=e50]: 영상 생성
+                - generic [ref=e52]:
+                  - generic [ref=e53]:
+                    - text: 주제
+                    - textbox "주제" [ref=e54]:
+                      - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                  - generic [ref=e55]:
+                    - text: 소스
+                    - generic [ref=e56]:
+                      - generic [ref=e57]:
+                        - generic [ref=e58]:
+                          - combobox [ref=e59] [cursor=pointer]:
+                            - generic: 블로그
+                            - img [ref=e60]
+                          - combobox [ref=e62]
+                        - textbox "https://..." [ref=e65]
+                        - button [disabled]:
+                          - img
+                      - button "소스 추가" [ref=e66] [cursor=pointer]:
+                        - img [ref=e67]
+                        - text: 소스 추가
+                  - generic [ref=e68]:
+                    - text: 스타일
+                    - generic [ref=e69]:
+                      - button "정보 전달 객관적 사실 중심" [ref=e70] [cursor=pointer]:
+                        - img [ref=e71]
+                        - generic [ref=e73]:
+                          - generic [ref=e74]: 정보 전달
+                          - generic [ref=e75]: 객관적 사실 중심
+                      - button "스토리텔링 이야기 구조" [ref=e76] [cursor=pointer]:
+                        - img [ref=e77]
+                        - generic [ref=e82]:
+                          - generic [ref=e83]: 스토리텔링
+                          - generic [ref=e84]: 이야기 구조
+                      - button "튜토리얼 단계별 설명" [ref=e85] [cursor=pointer]:
+                        - img [ref=e86]
+                        - generic [ref=e89]:
+                          - generic [ref=e90]: 튜토리얼
+                          - generic [ref=e91]: 단계별 설명
+                      - button "오피니언 관점 제시" [ref=e92] [cursor=pointer]:
+                        - img [ref=e93]
+                        - generic [ref=e95]:
+                          - generic [ref=e96]: 오피니언
+                          - generic [ref=e97]: 관점 제시
+                  - button "고급 설정" [ref=e98] [cursor=pointer]:
+                    - text: 고급 설정
+                    - img [ref=e107]
+                  - button "영상 생성 시작" [ref=e100] [cursor=pointer]
+  - region "Notifications alt+T"

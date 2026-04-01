@@ -1,0 +1,68 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: AI Video Studio
+        - button [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+      - navigation [ref=e11]:
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e13]
+          - generic [ref=e18]: 대시보드
+        - link "내 영상" [ref=e19] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e20]
+          - generic [ref=e22]: 내 영상
+      - generic [ref=e23]:
+        - button "다크 모드" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - generic [ref=e27]: 다크 모드
+        - generic [ref=e28]: test@example.com
+        - button "로그아웃" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - generic [ref=e33]: 로그아웃
+    - generic [ref=e34]:
+      - banner [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: 오늘 50/50
+          - generic [ref=e38]: test@example.com
+      - main [ref=e39]:
+        - generic [ref=e40]:
+          - link "대시보드" [ref=e41] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e42]
+            - text: 대시보드
+          - generic [ref=e44]:
+            - generic [ref=e45]:
+              - generic [ref=e46]: 실패
+              - generic [ref=e47]: 2026-04-01 14:19
+            - button "재시도" [ref=e49] [cursor=pointer]:
+              - img [ref=e50]
+              - text: 재시도
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - generic [ref=e57]: 추출
+              - generic [ref=e60]: 정규화
+              - generic [ref=e63]: 근거
+              - generic [ref=e66]: 대본
+              - generic [ref=e69]: 검수
+              - generic [ref=e72]: 정책
+              - generic [ref=e75]: 승인
+              - generic [ref=e78]: 에셋
+              - generic [ref=e81]: 조립
+            - generic [ref=e84]:
+              - generic [ref=e85]: "extract failed: All source extractions failed"
+              - generic [ref=e86]:
+                - generic [ref=e87]: $0.00 / $2.00
+                - generic [ref=e88]:
+                  - img [ref=e89]
+                  - text: 실시간
+          - generic [ref=e93]:
+            - tablist [ref=e94]:
+              - tab "진행 상세" [selected] [ref=e95] [cursor=pointer]
+              - tab "대본" [ref=e96] [cursor=pointer]
+              - tab "결과" [ref=e97] [cursor=pointer]
+            - tabpanel "진행 상세" [ref=e98]:
+              - img [ref=e100]
+  - region "Notifications alt+T"

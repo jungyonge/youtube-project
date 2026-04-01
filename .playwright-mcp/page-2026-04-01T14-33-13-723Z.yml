@@ -1,0 +1,234 @@
+- generic [ref=e2]:
+  - generic [ref=e18]:
+    - complementary [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: AI Video Studio
+        - button [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+      - navigation [ref=e26]:
+        - link "대시보드" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e28]
+          - generic [ref=e33]: 대시보드
+        - link "내 영상" [ref=e34] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e35]
+          - generic [ref=e37]: 내 영상
+      - generic [ref=e38]:
+        - button "다크 모드" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+          - generic [ref=e42]: 다크 모드
+        - generic [ref=e43]: test@example.com
+        - button "로그아웃" [ref=e44] [cursor=pointer]:
+          - img [ref=e45]
+          - generic [ref=e48]: 로그아웃
+    - generic [ref=e49]:
+      - banner [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: 오늘 50/50
+          - generic [ref=e53]: test@example.com
+      - main [ref=e54]:
+        - generic [ref=e55]:
+          - heading "대시보드" [level=1] [ref=e56]
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - generic [ref=e60]: 영상 생성
+              - generic [ref=e62]:
+                - generic [ref=e63]:
+                  - text: 주제
+                  - textbox "주제" [ref=e64]:
+                    - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                - generic [ref=e65]:
+                  - text: 소스
+                  - generic [ref=e66]:
+                    - generic [ref=e67]:
+                      - generic [ref=e68]:
+                        - combobox [ref=e69] [cursor=pointer]:
+                          - generic: 블로그
+                          - img [ref=e70]
+                        - combobox [ref=e72]
+                      - textbox "https://..." [ref=e75]
+                      - button [disabled]:
+                        - img
+                    - button "소스 추가" [ref=e76] [cursor=pointer]:
+                      - img [ref=e77]
+                      - text: 소스 추가
+                - generic [ref=e78]:
+                  - text: 스타일
+                  - generic [ref=e79]:
+                    - button "정보 전달 객관적 사실 중심" [ref=e80] [cursor=pointer]:
+                      - img [ref=e81]
+                      - generic [ref=e83]:
+                        - generic [ref=e84]: 정보 전달
+                        - generic [ref=e85]: 객관적 사실 중심
+                    - button "스토리텔링 이야기 구조" [ref=e86] [cursor=pointer]:
+                      - img [ref=e87]
+                      - generic [ref=e92]:
+                        - generic [ref=e93]: 스토리텔링
+                        - generic [ref=e94]: 이야기 구조
+                    - button "튜토리얼 단계별 설명" [ref=e95] [cursor=pointer]:
+                      - img [ref=e96]
+                      - generic [ref=e99]:
+                        - generic [ref=e100]: 튜토리얼
+                        - generic [ref=e101]: 단계별 설명
+                    - button "오피니언 관점 제시" [ref=e102] [cursor=pointer]:
+                      - img [ref=e103]
+                      - generic [ref=e105]:
+                        - generic [ref=e106]: 오피니언
+                        - generic [ref=e107]: 관점 제시
+                - button "고급 설정" [ref=e108] [cursor=pointer]:
+                  - text: 고급 설정
+                  - img [ref=e109]
+                - button "영상 생성 시작" [ref=e111] [cursor=pointer]
+            - generic [ref=e112]:
+              - heading "내 영상" [level=2] [ref=e113]
+              - generic [ref=e114]:
+                - generic [ref=e116] [cursor=pointer]:
+                  - generic [ref=e117]:
+                    - generic [ref=e118]: 취소됨
+                    - generic [ref=e119]: 약 9시간 전
+                  - generic [ref=e122]:
+                    - generic [ref=e123]: "extract failed: All source extractions failed"
+                    - generic [ref=e124]: $0.00 / $2.00
+                - generic [ref=e126] [cursor=pointer]:
+                  - generic [ref=e127]:
+                    - generic [ref=e128]: 실패
+                    - generic [ref=e129]: 약 9시간 전
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: "extract failed: All source extractions failed"
+                    - generic [ref=e134]: $0.00 / $2.00
+                - generic [ref=e136] [cursor=pointer]:
+                  - generic [ref=e137]:
+                    - generic [ref=e138]: 실패
+                    - generic [ref=e139]: 약 9시간 전
+                  - generic [ref=e142]:
+                    - generic [ref=e143]: "extract failed: All source extractions failed"
+                    - generic [ref=e144]: $0.00 / $2.00
+                - generic [ref=e146] [cursor=pointer]:
+                  - generic [ref=e147]:
+                    - generic [ref=e148]: 실패
+                    - generic [ref=e149]: 약 9시간 전
+                  - generic [ref=e152]:
+                    - generic [ref=e153]: "extract failed: All source extractions failed"
+                    - generic [ref=e154]: $0.00 / $2.00
+                - generic [ref=e156] [cursor=pointer]:
+                  - generic [ref=e157]:
+                    - generic [ref=e158]: 실패
+                    - generic [ref=e159]: 약 9시간 전
+                  - generic [ref=e162]:
+                    - generic [ref=e163]: "extract failed: All source extractions failed"
+                    - generic [ref=e164]: $0.00 / $2.00
+                - generic [ref=e166] [cursor=pointer]:
+                  - generic [ref=e167]:
+                    - generic [ref=e168]: 실패
+                    - generic [ref=e169]: 약 9시간 전
+                  - generic [ref=e172]:
+                    - generic [ref=e173]: "extract failed: All source extractions failed"
+                    - generic [ref=e174]: $0.00 / $2.00
+                - generic [ref=e176] [cursor=pointer]:
+                  - generic [ref=e177]:
+                    - generic [ref=e178]: 실패
+                    - generic [ref=e179]: 약 9시간 전
+                  - generic [ref=e182]:
+                    - generic [ref=e183]: "extract failed: All source extractions failed"
+                    - generic [ref=e184]: $0.00 / $2.00
+                - generic [ref=e186] [cursor=pointer]:
+                  - generic [ref=e187]:
+                    - generic [ref=e188]: 실패
+                    - generic [ref=e189]: 약 9시간 전
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: "extract failed: All source extractions failed"
+                    - generic [ref=e194]: $0.00 / $2.00
+                - generic [ref=e196] [cursor=pointer]:
+                  - generic [ref=e197]:
+                    - generic [ref=e198]: 실패
+                    - generic [ref=e199]: 약 9시간 전
+                  - generic [ref=e202]:
+                    - generic [ref=e203]: "extract failed: All source extractions failed"
+                    - generic [ref=e204]: $0.00 / $2.00
+                - generic [ref=e206] [cursor=pointer]:
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: 실패
+                    - generic [ref=e209]: 약 9시간 전
+                  - generic [ref=e212]:
+                    - generic [ref=e213]: "extract failed: All source extractions failed"
+                    - generic [ref=e214]: $0.00 / $2.00
+                - generic [ref=e216] [cursor=pointer]:
+                  - generic [ref=e217]:
+                    - generic [ref=e218]: 실패
+                    - generic [ref=e219]: 약 9시간 전
+                  - generic [ref=e222]:
+                    - generic [ref=e223]: "extract failed: All source extractions failed"
+                    - generic [ref=e224]: $0.00 / $2.00
+                - generic [ref=e226] [cursor=pointer]:
+                  - generic [ref=e227]:
+                    - generic [ref=e228]: 실패
+                    - generic [ref=e229]: 약 9시간 전
+                  - generic [ref=e232]:
+                    - generic [ref=e233]: "extract failed: All source extractions failed"
+                    - generic [ref=e234]: $0.00 / $2.00
+                - generic [ref=e236] [cursor=pointer]:
+                  - generic [ref=e237]:
+                    - generic [ref=e238]: 실패
+                    - generic [ref=e239]: 약 9시간 전
+                  - generic [ref=e242]:
+                    - generic [ref=e243]: "extract failed: All source extractions failed"
+                    - generic [ref=e244]: $0.00 / $2.00
+                - generic [ref=e246] [cursor=pointer]:
+                  - generic [ref=e247]:
+                    - generic [ref=e248]: 실패
+                    - generic [ref=e249]: 약 9시간 전
+                  - generic [ref=e252]:
+                    - generic [ref=e253]: "extract failed: All source extractions failed"
+                    - generic [ref=e254]: $0.00 / $2.00
+                - generic [ref=e256] [cursor=pointer]:
+                  - generic [ref=e257]:
+                    - generic [ref=e258]: 실패
+                    - generic [ref=e259]: 약 9시간 전
+                  - generic [ref=e262]:
+                    - generic [ref=e263]: "extract failed: All source extractions failed"
+                    - generic [ref=e264]: $0.00 / $2.00
+                - generic [ref=e266] [cursor=pointer]:
+                  - generic [ref=e267]:
+                    - generic [ref=e268]: 실패
+                    - generic [ref=e269]: 약 9시간 전
+                  - generic [ref=e272]:
+                    - generic [ref=e273]: "extract failed: All source extractions failed"
+                    - generic [ref=e274]: $0.00 / $2.00
+                - generic [ref=e276] [cursor=pointer]:
+                  - generic [ref=e277]:
+                    - generic [ref=e278]: 실패
+                    - generic [ref=e279]: 약 9시간 전
+                  - generic [ref=e282]:
+                    - generic [ref=e283]: "extract failed: All source extractions failed"
+                    - generic [ref=e284]: $0.00 / $2.00
+                - generic [ref=e286] [cursor=pointer]:
+                  - generic [ref=e287]:
+                    - generic [ref=e288]: 실패
+                    - generic [ref=e289]: 약 9시간 전
+                  - generic [ref=e292]:
+                    - generic [ref=e293]: "extract failed: All source extractions failed"
+                    - generic [ref=e294]: $0.00 / $2.00
+                - generic [ref=e296] [cursor=pointer]:
+                  - generic [ref=e297]:
+                    - generic [ref=e298]: 실패
+                    - generic [ref=e299]: 약 9시간 전
+                  - generic [ref=e302]:
+                    - generic [ref=e303]: "extract failed: All source extractions failed"
+                    - generic [ref=e304]: $0.00 / $2.00
+                - generic [ref=e306] [cursor=pointer]:
+                  - generic [ref=e307]:
+                    - generic [ref=e308]: 실패
+                    - generic [ref=e309]: 약 9시간 전
+                  - generic [ref=e312]:
+                    - generic [ref=e313]: "extract failed: All source extractions failed"
+                    - generic [ref=e314]: $0.00 / $2.00
+                - generic [ref=e315]:
+                  - button "이전" [disabled]
+                  - generic [ref=e316]: 1 / 3
+                  - button "다음" [ref=e317] [cursor=pointer]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e318]:
+        - img [ref=e320]
+        - generic [ref=e323]: 로그인 성공

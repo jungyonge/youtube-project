@@ -1,0 +1,113 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: AI Video Studio
+        - button [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+      - navigation [ref=e11]:
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e13]
+          - generic [ref=e18]: 대시보드
+        - link "내 영상" [ref=e19] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e20]
+          - generic [ref=e22]: 내 영상
+        - link "관리" [ref=e23] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e24]
+          - generic [ref=e26]: 관리
+      - generic [ref=e27]:
+        - button "다크 모드" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+          - generic [ref=e31]: 다크 모드
+        - generic [ref=e32]: test@example.com
+        - button "로그아웃" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e37]: 로그아웃
+    - generic [ref=e38]:
+      - banner [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: 오늘 21/50
+          - generic [ref=e42]: test@example.com
+      - main [ref=e43]:
+        - generic [ref=e435]:
+          - link "대시보드" [ref=e436] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e437]
+            - text: 대시보드
+          - generic [ref=e439]:
+            - generic [ref=e440]:
+              - generic [ref=e441]: 실패
+              - generic [ref=e442]: 2026-04-01 14:11
+            - button "재시도" [ref=e520] [cursor=pointer]:
+              - img [ref=e521]
+              - text: 재시도
+          - generic [ref=e448]:
+            - generic [ref=e449]:
+              - generic [ref=e452]: 추출
+              - generic [ref=e455]: 정규화
+              - generic [ref=e458]: 근거
+              - generic [ref=e461]: 대본
+              - generic [ref=e464]: 검수
+              - generic [ref=e467]: 정책
+              - generic [ref=e470]: 승인
+              - generic [ref=e473]: 에셋
+              - generic [ref=e476]: 조립
+            - generic [ref=e479]:
+              - generic [ref=e480]: "research failed: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To mo"
+              - generic [ref=e481]:
+                - generic [ref=e482]: $0.00 / $5.00
+                - generic [ref=e483]:
+                  - img [ref=e484]
+                  - text: 실시간
+          - generic [ref=e488]:
+            - tablist [ref=e489]:
+              - tab "진행 상세" [selected] [ref=e490] [cursor=pointer]
+              - tab "대본" [ref=e491] [cursor=pointer]
+              - tab "결과" [ref=e492] [cursor=pointer]
+            - tabpanel "진행 상세" [ref=e493]:
+              - table [ref=e495]:
+                - rowgroup [ref=e496]:
+                  - row "단계 상태 소요 시간 비용 오류" [ref=e497]:
+                    - columnheader [ref=e498]
+                    - columnheader "단계" [ref=e499]
+                    - columnheader "상태" [ref=e500]
+                    - columnheader "소요 시간" [ref=e501]
+                    - columnheader "비용" [ref=e502]
+                    - columnheader "오류" [ref=e503]
+                - rowgroup [ref=e504]:
+                  - row "extract completed - $0.00 -" [ref=e525]:
+                    - cell [ref=e506]:
+                      - img [ref=e526]
+                    - cell "extract" [ref=e509]
+                    - cell "completed" [ref=e529]
+                    - cell "-" [ref=e511]
+                    - cell "$0.00" [ref=e512]
+                    - cell "-" [ref=e513]
+                  - row "normalize completed - $0.00 -" [ref=e530]:
+                    - cell [ref=e531]:
+                      - img [ref=e532]
+                    - cell "normalize" [ref=e535]
+                    - cell "completed" [ref=e536]
+                    - cell "-" [ref=e537]
+                    - cell "$0.00" [ref=e538]
+                    - cell "-" [ref=e539]
+                  - row "evidence_pack completed - $0.00 -" [ref=e540]:
+                    - cell [ref=e541]:
+                      - img [ref=e542]
+                    - cell "evidence_pack" [ref=e545]
+                    - cell "completed" [ref=e546]
+                    - cell "-" [ref=e547]
+                    - cell "$0.00" [ref=e548]
+                    - cell "-" [ref=e549]
+                  - row [ref=e550]:
+                    - cell [ref=e551]:
+                      - img [ref=e552]
+                    - cell "research" [ref=e556]
+                    - cell "failed" [ref=e557]
+                    - cell "-" [ref=e558]
+                    - cell "$0.00" [ref=e559]
+                    - cell [ref=e560]
+  - region "Notifications alt+T"

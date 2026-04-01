@@ -1,0 +1,178 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: AI Video Studio
+        - button [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+      - navigation [ref=e11]:
+        - link "대시보드" [ref=e12] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e13]
+          - generic [ref=e18]: 대시보드
+        - link "내 영상" [ref=e19] [cursor=pointer]:
+          - /url: /jobs
+          - img [ref=e20]
+          - generic [ref=e22]: 내 영상
+      - generic [ref=e23]:
+        - button "다크 모드" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - generic [ref=e27]: 다크 모드
+        - generic [ref=e28]: test@example.com
+        - button "로그아웃" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - generic [ref=e33]: 로그아웃
+    - generic [ref=e34]:
+      - banner [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: 오늘 50/50
+          - generic [ref=e38]: test@example.com
+      - main [ref=e39]:
+        - generic [ref=e40]:
+          - heading "내 영상" [level=1] [ref=e41]
+          - generic [ref=e246]:
+            - generic [ref=e248] [cursor=pointer]:
+              - generic [ref=e249]:
+                - generic [ref=e250]: 실패
+                - generic [ref=e251]: 약 10시간 전
+              - generic [ref=e254]:
+                - generic [ref=e255]: "extract failed: All source extractions failed"
+                - generic [ref=e256]: $0.00 / $2.00
+            - generic [ref=e258] [cursor=pointer]:
+              - generic [ref=e259]:
+                - generic [ref=e260]: 실패
+                - generic [ref=e261]: 약 10시간 전
+              - generic [ref=e264]:
+                - generic [ref=e265]: "extract failed: All source extractions failed"
+                - generic [ref=e266]: $0.00 / $2.00
+            - generic [ref=e268] [cursor=pointer]:
+              - generic [ref=e269]:
+                - generic [ref=e270]: 실패
+                - generic [ref=e271]: 약 10시간 전
+              - generic [ref=e274]:
+                - generic [ref=e275]: "extract failed: All source extractions failed"
+                - generic [ref=e276]: $0.00 / $2.00
+            - generic [ref=e278] [cursor=pointer]:
+              - generic [ref=e279]:
+                - generic [ref=e280]: 실패
+                - generic [ref=e281]: 약 10시간 전
+              - generic [ref=e284]:
+                - generic [ref=e285]: "extract failed: All source extractions failed"
+                - generic [ref=e286]: $0.00 / $2.00
+            - generic [ref=e288] [cursor=pointer]:
+              - generic [ref=e289]:
+                - generic [ref=e290]: 실패
+                - generic [ref=e291]: 약 10시간 전
+              - generic [ref=e294]:
+                - generic [ref=e295]: "extract failed: All source extractions failed"
+                - generic [ref=e296]: $0.00 / $2.00
+            - generic [ref=e298] [cursor=pointer]:
+              - generic [ref=e299]:
+                - generic [ref=e300]: 실패
+                - generic [ref=e301]: 약 10시간 전
+              - generic [ref=e304]:
+                - generic [ref=e305]: "extract failed: All source extractions failed"
+                - generic [ref=e306]: $0.00 / $2.00
+            - generic [ref=e308] [cursor=pointer]:
+              - generic [ref=e309]:
+                - generic [ref=e310]: 실패
+                - generic [ref=e311]: 약 10시간 전
+              - generic [ref=e314]:
+                - generic [ref=e315]: "extract failed: All source extractions failed"
+                - generic [ref=e316]: $0.00 / $2.00
+            - generic [ref=e318] [cursor=pointer]:
+              - generic [ref=e319]:
+                - generic [ref=e320]: 실패
+                - generic [ref=e321]: 약 10시간 전
+              - generic [ref=e324]:
+                - generic [ref=e325]: "extract failed: All source extractions failed"
+                - generic [ref=e326]: $0.00 / $2.00
+            - generic [ref=e328] [cursor=pointer]:
+              - generic [ref=e329]:
+                - generic [ref=e330]: 실패
+                - generic [ref=e331]: 약 10시간 전
+              - generic [ref=e335]:
+                - generic [ref=e336]: "research failed: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To mo"
+                - generic [ref=e337]: $0.00 / $5.00
+            - generic [ref=e339] [cursor=pointer]:
+              - generic [ref=e340]:
+                - generic [ref=e341]: 실패
+                - generic [ref=e342]: 약 11시간 전
+              - generic [ref=e345]:
+                - generic [ref=e346]: "extract failed: All source extractions failed"
+                - generic [ref=e347]: $0.00 / $2.00
+            - generic [ref=e349] [cursor=pointer]:
+              - generic [ref=e350]:
+                - generic [ref=e351]: 실패
+                - generic [ref=e352]: 약 11시간 전
+              - generic [ref=e355]:
+                - generic [ref=e356]: "extract failed: All source extractions failed"
+                - generic [ref=e357]: $0.00 / $2.00
+            - generic [ref=e359] [cursor=pointer]:
+              - generic [ref=e360]:
+                - generic [ref=e361]: 실패
+                - generic [ref=e362]: 약 11시간 전
+              - generic [ref=e366]:
+                - generic [ref=e367]: "extract failed: Job cancelled"
+                - generic [ref=e368]: $0.01 / $2.00
+            - generic [ref=e370] [cursor=pointer]:
+              - generic [ref=e371]:
+                - generic [ref=e372]: 실패
+                - generic [ref=e373]: 약 11시간 전
+              - generic [ref=e377]:
+                - generic [ref=e378]: "research failed: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To mo"
+                - generic [ref=e379]: $0.01 / $2.00
+            - generic [ref=e381] [cursor=pointer]:
+              - generic [ref=e382]:
+                - generic [ref=e383]: 실패
+                - generic [ref=e384]: 약 11시간 전
+              - generic [ref=e388]:
+                - generic [ref=e389]: "research failed: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $2: datetime.datetime(2026, 4, 1, 13, 29, 56... (can't subtract offset-naive and offset-aware datetimes) [SQL: UPDATE"
+                - generic [ref=e390]: $0.00 / $2.00
+            - generic [ref=e392] [cursor=pointer]:
+              - generic [ref=e393]:
+                - generic [ref=e394]: 취소됨
+                - generic [ref=e395]: 약 11시간 전
+              - generic [ref=e399]:
+                - generic [ref=e400]: evidence_pack completed
+                - generic [ref=e401]: $0.00 / $2.00
+            - generic [ref=e403] [cursor=pointer]:
+              - generic [ref=e404]:
+                - generic [ref=e405]: 실패
+                - generic [ref=e406]: 약 11시간 전
+              - generic [ref=e410]:
+                - generic [ref=e411]: "research failed: 'GenerateContentResponse' object has no attribute 'input_tokens'"
+                - generic [ref=e412]: $0.00 / $2.00
+            - generic [ref=e414] [cursor=pointer]:
+              - generic [ref=e415]:
+                - generic [ref=e416]: 실패
+                - generic [ref=e417]: 약 11시간 전
+              - generic [ref=e421]:
+                - generic [ref=e422]: "research failed: Unterminated string starting at: line 523 column 20 (char 19792)"
+                - generic [ref=e423]: $0.00 / $2.00
+            - generic [ref=e425] [cursor=pointer]:
+              - generic [ref=e426]:
+                - generic [ref=e427]: 실패
+                - generic [ref=e428]: 약 11시간 전
+              - generic [ref=e432]:
+                - generic [ref=e433]: "research failed: Expecting ',' delimiter: line 525 column 25 (char 18531)"
+                - generic [ref=e434]: $0.00 / $2.00
+            - generic [ref=e436] [cursor=pointer]:
+              - generic [ref=e437]:
+                - generic [ref=e438]: 실패
+                - generic [ref=e439]: 약 12시간 전
+              - generic [ref=e443]:
+                - generic [ref=e444]: "research failed: Expecting property name enclosed in double quotes: line 447 column 26 (char 16825)"
+                - generic [ref=e445]: $0.00 / $2.00
+            - generic [ref=e447] [cursor=pointer]:
+              - generic [ref=e448]:
+                - generic [ref=e449]: 실패
+                - generic [ref=e450]: 약 12시간 전
+              - generic [ref=e454]:
+                - generic [ref=e455]: "research failed: Expecting property name enclosed in double quotes: line 463 column 47 (char 15254)"
+                - generic [ref=e456]: $0.00 / $2.00
+            - generic [ref=e457]:
+              - button "이전" [ref=e458] [cursor=pointer]
+              - generic [ref=e459]: 2 / 3
+              - button "다음" [ref=e460] [cursor=pointer]
+  - region "Notifications alt+T"

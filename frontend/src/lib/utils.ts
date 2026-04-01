@@ -17,8 +17,8 @@ export function formatDuration(seconds: number): string {
 }
 
 /** USD 비용 포맷 → "$1.23" */
-export function formatCost(usd: number): string {
-  return `$${usd.toFixed(2)}`;
+export function formatCost(usd: number | null | undefined): string {
+  return `$${(usd ?? 0).toFixed(2)}`;
 }
 
 /** ISO 날짜 → "2026-03-31 14:30" 또는 상대 시간 */

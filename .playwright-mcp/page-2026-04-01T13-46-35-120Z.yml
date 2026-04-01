@@ -1,0 +1,323 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - generic: AI Video Studio
+          - button:
+            - img
+        - navigation:
+          - link:
+            - /url: /dashboard
+            - img
+            - generic: 대시보드
+          - link:
+            - /url: /jobs
+            - img
+            - generic: 내 영상
+          - link:
+            - /url: /admin
+            - img
+            - generic: 관리
+        - generic:
+          - button:
+            - img
+            - generic: 다크 모드
+          - generic: admin@example.com
+          - button:
+            - img
+            - generic: 로그아웃
+      - generic:
+        - banner:
+          - generic:
+            - generic: 오늘 0/5
+            - generic: admin@example.com
+        - main:
+          - generic:
+            - heading [level=1]: 관리자
+            - generic:
+              - generic:
+                - generic:
+                  - generic: 오늘 생성
+                  - img
+                - generic:
+                  - generic: 18건
+              - generic:
+                - generic:
+                  - generic: 성공률
+                  - img
+                - generic:
+                  - generic: 0.0%
+              - generic:
+                - generic:
+                  - generic: 일 비용
+                  - img
+                - generic:
+                  - generic: $0.01
+              - generic:
+                - generic:
+                  - generic: 활성 작업
+                  - img
+                - generic:
+                  - generic: 10건
+            - generic:
+              - generic:
+                - generic: 전체 작업
+                - generic:
+                  - combobox [expanded]:
+                    - generic: 전체
+                    - img
+                  - textbox:
+                    - /placeholder: 이메일 검색...
+              - generic:
+                - generic:
+                  - table:
+                    - rowgroup:
+                      - row:
+                        - columnheader: 사용자
+                        - columnheader: 주제
+                        - columnheader: 상태
+                        - columnheader: 비용
+                        - columnheader: 생성일
+                        - columnheader
+                    - rowgroup:
+                      - row:
+                        - cell
+                        - cell: 딥러닝이란 무엇인가 소개
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.01
+                        - cell: 2026-04-01 13:32
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 딥러닝 기초 입문 소개
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.00
+                        - cell: 2026-04-01 13:28
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 딥러닝 기초 소개
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 13:17
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 딥러닝 기초 개념 소개 영상
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.00
+                        - cell: 2026-04-01 13:14
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 딥러닝의 기본 개념 설명
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.00
+                        - cell: 2026-04-01 13:12
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 인공지능 기술의 미래 전망 소개
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.00
+                        - cell: 2026-04-01 13:09
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 인공지능 역사와 발전 과정에 대한 소개 영상
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.00
+                        - cell: 2026-04-01 13:04
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 파이프라인 전체 동작 확인 테스트용 영상입니다
+                        - cell:
+                          - generic: 실패
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:58
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 워커 테스트용 영상 파이프라인 동작 확인합니다
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:54
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 중복 소스 URL 테스트 영상입니다
+                        - cell
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:21
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: <script>alert('xss')</script> AI 트렌드
+                        - cell:
+                          - generic: 취소됨
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:21
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 직접 입력 빈 텍스트 테스트입니다
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:20
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: React와 TypeScript를 활용한 웹 개발 튜토리얼
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:19
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 인공지능의 미래와 우리 삶의 변화에 대한 이야기
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:03
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 비용 초과 테스트 영상입니다
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 12:00
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: 비용 예산 경계값 테스트 영상
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 11:59
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: URL 유효성 테스트 영상입니다
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 11:57
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+                      - row:
+                        - cell
+                        - cell: URL 유효성 테스트 영상입니다
+                        - cell:
+                          - generic: 대기 중
+                        - cell: $0.00
+                        - cell: 2026-04-01 11:55
+                        - cell:
+                          - generic:
+                            - button:
+                              - img
+                            - button:
+                              - img
+    - region "Notifications alt+T"
+  - listbox [ref=e376]:
+    - option "전체" [active] [selected] [ref=e377]:
+      - img [ref=e380]
+      - generic [ref=e382]: 전체
+    - option "대기" [ref=e383]:
+      - generic [ref=e385]: 대기
+    - option "추출 중" [ref=e386]:
+      - generic [ref=e388]: 추출 중
+    - option "대본 생성" [ref=e389]:
+      - generic [ref=e391]: 대본 생성
+    - option "승인 대기" [ref=e392]:
+      - generic [ref=e394]: 승인 대기
+    - option "에셋 생성" [ref=e395]:
+      - generic [ref=e397]: 에셋 생성
+    - option "영상 조립" [ref=e398]:
+      - generic [ref=e400]: 영상 조립
+    - option "완료" [ref=e401]:
+      - generic [ref=e403]: 완료
+    - option "실패" [ref=e404]:
+      - generic [ref=e406]: 실패
+    - option "취소" [ref=e407]:
+      - generic [ref=e409]: 취소

@@ -1,0 +1,303 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - generic: AI Video Studio
+          - button:
+            - img
+        - navigation:
+          - link:
+            - /url: /dashboard
+            - img
+            - generic: 대시보드
+          - link:
+            - /url: /jobs
+            - img
+            - generic: 내 영상
+          - link:
+            - /url: /admin
+            - img
+            - generic: 관리
+        - generic:
+          - button:
+            - img
+            - generic: 다크 모드
+          - generic: test@example.com
+          - button:
+            - img
+            - generic: 로그아웃
+      - generic:
+        - banner:
+          - generic:
+            - generic: 오늘 21/50
+            - generic: test@example.com
+        - main:
+          - generic:
+            - heading [level=1]: 대시보드
+            - generic:
+              - generic:
+                - generic:
+                  - generic: 영상 생성
+                - generic:
+                  - generic:
+                    - generic:
+                      - text: 주제
+                      - textbox:
+                        - /placeholder: 영상으로 만들 주제를 입력하세요 (5~200자)
+                        - text: 2024년 한국 스타트업 생태계 현황과 전망
+                    - generic:
+                      - text: 소스
+                      - generic:
+                        - generic:
+                          - generic:
+                            - combobox:
+                              - generic: 블로그
+                              - img
+                            - combobox
+                          - generic:
+                            - generic:
+                              - textbox:
+                                - /placeholder: https://...
+                                - text: https://example.com/startup-ecosystem
+                          - button:
+                            - img
+                        - generic:
+                          - generic:
+                            - combobox [expanded]:
+                              - generic: 블로그
+                              - img
+                            - combobox
+                          - generic:
+                            - generic:
+                              - textbox:
+                                - /placeholder: https://...
+                          - button:
+                            - img
+                        - button:
+                          - img
+                          - text: 소스 추가
+                    - generic:
+                      - text: 스타일
+                      - generic:
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 정보 전달
+                            - generic: 객관적 사실 중심
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 스토리텔링
+                            - generic: 이야기 구조
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 튜토리얼
+                            - generic: 단계별 설명
+                        - button:
+                          - img
+                          - generic:
+                            - generic: 오피니언
+                            - generic: 관점 제시
+                    - button:
+                      - text: 고급 설정
+                      - img
+                    - button: 영상 생성 시작
+              - generic:
+                - heading [level=2]: 내 영상
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: "extract failed: All source extractions failed"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: "extract failed: All source extractions failed"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 9시간 전
+                      - generic:
+                        - generic:
+                          - generic: "extract failed: Job cancelled"
+                          - generic: $0.01 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To mo"
+                          - generic: $0.01 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $2: datetime.datetime(2026, 4, 1, 13, 29, 56... (can't subtract offset-naive and offset-aware datetimes) [SQL: UPDATE"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 취소됨
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: evidence_pack completed
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: 'GenerateContentResponse' object has no attribute 'input_tokens'"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: Unterminated string starting at: line 523 column 20 (char 19792)"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: Expecting ',' delimiter: line 525 column 25 (char 18531)"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: Expecting property name enclosed in double quotes: line 447 column 26 (char 16825)"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 실패
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: "research failed: Expecting property name enclosed in double quotes: line 463 column 47 (char 15254)"
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 10시간 전
+                      - generic:
+                        - generic:
+                          - generic: extract completed
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: Retrying from extract
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 취소됨
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $3.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $10.00
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $0.50
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: 대기 중
+                        - generic: 약 11시간 전
+                      - generic:
+                        - generic:
+                          - generic: 0%
+                          - generic: $0.00 / $2.00
+                  - generic:
+                    - button [disabled]: 이전
+                    - generic: 1 / 2
+                    - button: 다음
+    - region "Notifications alt+T"
+  - listbox [ref=e334]:
+    - option "블로그" [active] [selected] [ref=e335]:
+      - img [ref=e338]
+      - generic [ref=e340]: 블로그
+    - option "뉴스" [ref=e341]:
+      - generic [ref=e343]: 뉴스
+    - option "유튜브" [ref=e344]:
+      - generic [ref=e346]: 유튜브
+    - option "직접 입력" [ref=e347]:
+      - generic [ref=e349]: 직접 입력

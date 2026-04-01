@@ -93,7 +93,7 @@ async def get_stats(
     if target_date is None:
         target_date = datetime.now(timezone.utc).date()
 
-    day_start = datetime(target_date.year, target_date.month, target_date.day, tzinfo=timezone.utc)
+    day_start = datetime(target_date.year, target_date.month, target_date.day)
     day_end = day_start + timedelta(days=1)
 
     # Job 통계

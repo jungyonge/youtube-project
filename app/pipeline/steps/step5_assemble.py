@@ -389,8 +389,8 @@ def assemble_task(self, job_id: str) -> str:
                     output_thumbnail_key=thumbnail_key,
                     total_duration_sec=int(total_duration),
                     generation_time_sec=generation_time,
-                    completed_at=datetime.now(timezone.utc),
-                    updated_at=datetime.now(timezone.utc),
+                    completed_at=datetime.utcnow(),
+                    updated_at=datetime.utcnow(),
                 )
             )
             db.commit()
